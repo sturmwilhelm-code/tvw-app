@@ -98,6 +98,10 @@
     <script type="module">
         import { db, auth } from './firebase-config.js';
         import { serverTimestamp, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+        
+        // Die Imports für die Firebase SDKs müssen als Module sein.
+        // Dafür muss der Skript-Tag "type='module'" haben.
+        // Da du bereits ES-Module verwendest, ist das so korrekt.
 
         const bestellformular = document.getElementById("bestellformular");
         const nameInput = document.getElementById("name");
@@ -106,30 +110,35 @@
 
         let userUid = null;
 
-        bestellformular.addEventListener("submit", (e) => {
+        bestellformular.addEventListener("submit", async (e) => { // async hinzugefügt
             e.preventDefault();
 
             const name = nameInput.value;
             const gericht = gerichtInput.value;
             const sonderwuensche = sonderwuenscheInput.value;
-
-            addDoc(collection(db, "bestellungen"), {
-                userId: userUid,
-                name: name,
-                gericht: gericht,
-                sonderwuensche: sonderwuensche,
-                timestamp: serverTimestamp()
-            })
-            .then(() => {
+            
+            try {
+                // Hier wird die Bestellung an die Datenbank gesendet
+                const docRef = await addDoc(collection(db, "bestellungen"), {
+                    userId: userUid,
+                    name: name,
+                    gericht: gericht,
+                    sonderwuensche: sonderwuensche,
+                    timestamp: serverTimestamp()
+                });
+                
+                // Nur wenn die Bestellung erfolgreich war, kommt das Pop-up
                 alert("Bestellung erfolgreich gespeichert!");
                 bestellformular.reset();
-            })
-            .catch((error) => {
+
+            } catch (error) {
+                // Bei einem Fehler wird dies ausgelöst
                 console.error("Fehler beim Speichern der Bestellung: ", error);
                 alert("Fehler beim Speichern der Bestellung.");
-            });
+            }
         });
 
+        // Anonyme Authentifizierung, um eine Benutzer-ID zu erhalten
         auth.signInAnonymously().then((userCredential) => {
             userUid = userCredential.user.uid;
             console.log("Benutzer-ID:", userUid);
