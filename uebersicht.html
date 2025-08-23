@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <title>Essensbestellung Spielersitzung - Übersicht</title>
     <link rel="icon" href="favicon.png" type="image/png">
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -60,7 +57,6 @@
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        /* NEU: CSS für die Button-Anordnung */
         .button-container {
             display: flex;
             justify-content: space-between;
@@ -75,7 +71,6 @@
         .link-button, .home-button {
             text-decoration: none;
         }
-        /* Versteckt alle unnötigen Elemente für den Druck */
         @media print {
             body > *:not(.print-only) {
                 display: none !important;
@@ -111,160 +106,140 @@
     <button id="resetButton" class="reset-button">Alle Bestellungen löschen</button>
     <button id="printButton">Liste drucken</button>
 
-    <script>
-    // Dein Konfigurationscode von Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
-      authDomain: "tvw-app-test.firebaseapp.com",
-      projectId: "tvw-app-test",
-      storageBucket: "tvw-app-test.firebasestorage.app",
-      messagingSenderId: "114103141435",
-      appId: "1:114103141435:web:824e76f9109218a1ef881e",
-      measurementId: "G-G1E8WRYGG9"
-    };
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-    // Firebase-App, Firestore und Auth initialisieren
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    let userUid = null;
+        const essensliste = document.getElementById("essensliste");
+        const gesamtuebersicht = document.getElementById("gesamtuebersicht");
+        const resetButton = document.getElementById("resetButton");
+        const printButton = document.getElementById("printButton");
 
-    // Elemente aus dem HTML-Code auswählen
-    const essensliste = document.getElementById("essensliste");
-    const gesamtuebersicht = document.getElementById("gesamtuebersicht");
-    const resetButton = document.getElementById("resetButton");
-    const printButton = document.getElementById("printButton");
+        let userUid = null;
 
-    // Daten aus der Datenbank lesen, zählen und anzeigen
-    function loadBestellungen() {
-        db.collection("bestellungen").orderBy("timestamp", "asc").get().then((querySnapshot) => {
-            essensliste.innerHTML = '';
+        function resetBestellungen() {
+            const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
             
-            const zusammenfassungDaten = {};
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                
-                const gerichtOriginal = data.gericht;
-                const gerichtFuerZaehlung = gerichtOriginal.toLowerCase().trim();
-                const sonderwuensche = data.sonderwuensche || 'Keine';
-                
-                if (!zusammenfassungDaten[gerichtFuerZaehlung]) {
-                    zusammenfassungDaten[gerichtFuerZaehlung] = {
-                        name: gerichtOriginal,
-                        anzahl: 0,
-                        wuensche: {}
-                    };
-                }
-                
-                zusammenfassungDaten[gerichtFuerZaehlung].anzahl++;
-
-                if (sonderwuensche !== 'Keine') {
-                    const wunschFuerZaehlung = sonderwuensche.toLowerCase().trim();
-                    if (!zusammenfassungDaten[gerichtFuerZaehlung].wuensche[wunschFuerZaehlung]) {
-                         zusammenfassungDaten[gerichtFuerZaehlung].wuensche[wunschFuerZaehlung] = {
-                            name: sonderwuensche,
-                            anzahl: 0
-                         };
-                    }
-                    zusammenfassungDaten[gerichtFuerZaehlung].wuensche[wunschFuerZaehlung].anzahl++;
-                }
-
-                const li = document.createElement("li");
-                
-                const deleteButton = document.createElement("button");
-                deleteButton.textContent = "Löschen";
-                deleteButton.style.backgroundColor = "#dc3545";
-                deleteButton.style.width = "auto";
-                deleteButton.style.marginBottom = "0";
-                deleteButton.className = "deleteButton";
-
-                if (data.userId && data.userId === userUid) {
-                    deleteButton.style.display = "inline-block";
-                    deleteButton.addEventListener("click", () => {
-                        db.collection("bestellungen").doc(doc.id).delete()
-                            .then(() => {
-                                console.log("Dokument erfolgreich gelöscht!");
-                                loadBestellungen();
-                            })
-                            .catch((error) => {
-                                console.error("Fehler beim Löschen des Dokuments: ", error);
-                            });
-                    });
-                } else {
-                    deleteButton.style.display = "none";
-                }
-                
-                const divContainer = document.createElement("div");
-                divContainer.style.display = "flex";
-                divContainer.style.justifyContent = "space-between";
-                divContainer.style.alignItems = "center";
-                
-                const textSpan = document.createElement("span");
-                textSpan.innerHTML = `${data.name} bestellt: ${data.gericht}. Sonderwünsche: <b>${sonderwuensche}</b>`;
-                
-                divContainer.appendChild(textSpan);
-                divContainer.appendChild(deleteButton);
-                li.appendChild(divContainer);
-                essensliste.appendChild(li);
-            });
-            
-            let uebersichtHTML = '<ul>';
-            for (const gerichtKey in zusammenfassungDaten) {
-                const gerichtData = zusammenfassungDaten[gerichtKey];
-                uebersichtHTML += `<li><strong>${gerichtData.anzahl}x ${gerichtData.name}</strong>`;
-                if (Object.keys(gerichtData.wuensche).length > 0) {
-                    uebersichtHTML += `<ul>`;
-                    for (const wunschKey in gerichtData.wuensche) {
-                        const wunschData = gerichtData.wuensche[wunschKey];
-                        uebersichtHTML += `<li>${wunschData.anzahl}x Sonderwunsch: ${wunschData.name}</li>`;
-                    }
-                    uebersichtHTML += `</ul>`;
-                }
-                uebersichtHTML += `</li>`;
-            }
-            uebersichtHTML += '</ul>';
-            
-            gesamtuebersicht.innerHTML = `<h3>Zusammenfassung der Bestellungen</h3>${uebersichtHTML}`;
-        });
-    }
-
-    function resetBestellungen() {
-        const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
-        
-        if (bestaetigung) {
-            db.collection("bestellungen").get().then((querySnapshot) => {
-                const batch = db.batch();
-                querySnapshot.forEach((doc) => {
-                    batch.delete(doc.ref);
+            if (bestaetigung) {
+                getDocs(collection(db, "bestellungen"))
+                .then((querySnapshot) => {
+                    const deletePromises = querySnapshot.docs.map(document => 
+                        deleteDoc(doc(db, "bestellungen", document.id))
+                    );
+                    return Promise.all(deletePromises);
+                })
+                .then(() => {
+                    alert("Alle Bestellungen wurden erfolgreich gelöscht.");
+                })
+                .catch((error) => {
+                    console.error("Fehler beim Löschen aller Bestellungen: ", error);
+                    alert("Fehler beim Löschen der Bestellungen.");
                 });
-                return batch.commit();
-            })
-            .then(() => {
-                alert("Alle Bestellungen wurden erfolgreich gelöscht.");
-                loadBestellungen();
-            })
-            .catch((error) => {
-                console.error("Fehler beim Löschen aller Bestellungen: ", error);
-                alert("Fehler beim Löschen der Bestellungen.");
-            });
+            }
         }
-    }
-    
-    function printList() {
-        window.print();
-    }
+        
+        function printList() {
+            window.print();
+        }
 
-    resetButton.addEventListener("click", resetBestellungen);
-    printButton.addEventListener("click", printList);
+        resetButton.addEventListener("click", resetBestellungen);
+        printButton.addEventListener("click", printList);
+        
+        auth.signInAnonymously().then((userCredential) => {
+            userUid = userCredential.user.uid;
+            console.log("Benutzer-ID:", userUid);
 
-    auth.signInAnonymously().then((userCredential) => {
-        userUid = userCredential.user.uid;
-        console.log("Benutzer-ID:", userUid);
-        loadBestellungen();
-    }).catch((error) => {
-        console.error("Fehler bei der anonymen Anmeldung:", error);
-    });
+            const q = query(collection(db, "bestellungen"), orderBy("timestamp", "asc"));
+            onSnapshot(q, (querySnapshot) => {
+                essensliste.innerHTML = '';
+                
+                const zusammenfassungDaten = {};
+                let gesamtBestellungen = 0;
+
+                if (querySnapshot.empty) {
+                    essensliste.innerHTML = "<li><p>Es gibt noch keine Bestellungen.</p></li>";
+                    gesamtuebersicht.innerHTML = "<h3>Zusammenfassung der Bestellungen</h3><p>Keine Bestellungen vorhanden.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((document) => {
+                    const data = document.data();
+                    
+                    const gericht = data.gericht;
+                    const sonderwuensche = data.sonderwuensche || 'Keine';
+                    gesamtBestellungen++;
+
+                    if (!zusammenfassungDaten[gericht]) {
+                        zusammenfassungDaten[gericht] = {
+                            anzahl: 0,
+                            wuensche: {}
+                        };
+                    }
+                    
+                    zusammenfassungDaten[gericht].anzahl++;
+
+                    if (sonderwuensche !== 'Keine') {
+                        if (!zusammenfassungDaten[gericht].wuensche[sonderwuensche]) {
+                            zusammenfassungDaten[gericht].wuensche[sonderwuensche] = 0;
+                        }
+                        zusammenfassungDaten[gericht].wuensche[sonderwuensche]++;
+                    }
+
+                    const li = document.createElement("li");
+                    
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Löschen";
+                    deleteButton.style.backgroundColor = "#dc3545";
+                    deleteButton.style.width = "auto";
+                    deleteButton.style.marginBottom = "0";
+                    deleteButton.style.marginLeft = "10px";
+                    
+                    if (data.userId === userUid) {
+                        deleteButton.style.display = "inline-block";
+                        deleteButton.addEventListener("click", () => {
+                            deleteDoc(doc(db, "bestellungen", document.id))
+                                .then(() => {
+                                    console.log("Dokument erfolgreich gelöscht!");
+                                })
+                                .catch((error) => {
+                                    console.error("Fehler beim Löschen des Dokuments: ", error);
+                                });
+                        });
+                    } else {
+                        deleteButton.style.display = "none";
+                    }
+                    
+                    const textSpan = document.createElement("span");
+                    textSpan.innerHTML = `${data.name} bestellt: <strong>${gericht}</strong>. Sonderwünsche: <b>${sonderwuensche}</b>`;
+
+                    li.appendChild(textSpan);
+                    li.appendChild(deleteButton);
+                    essensliste.appendChild(li);
+                });
+
+                let uebersichtHTML = `<h4>Gesamt: ${gesamtBestellungen} Bestellungen</h4><ul>`;
+                for (const gericht in zusammenfassungDaten) {
+                    const data = zusammenfassungDaten[gericht];
+                    uebersichtHTML += `<li><strong>${data.anzahl}x ${gericht}</strong>`;
+                    if (Object.keys(data.wuensche).length > 0) {
+                        uebersichtHTML += `<ul>`;
+                        for (const wunsch in data.wuensche) {
+                            uebersichtHTML += `<li>${data.wuensche[wunsch]}x Sonderwunsch: ${wunsch}</li>`;
+                        }
+                        uebersichtHTML += `</ul>`;
+                    }
+                    uebersichtHTML += `</li>`;
+                }
+                uebersichtHTML += '</ul>';
+                
+                gesamtuebersicht.innerHTML = `<h3>Zusammenfassung der Bestellungen</h3>${uebersichtHTML}`;
+            }, err => {
+                console.error("Fehler beim Abrufen der Bestellungen: ", err);
+                essensliste.innerHTML = "<li><p>Fehler beim Laden der Bestellungen.</p></li>";
+            });
+        }).catch((error) => {
+            console.error("Fehler bei der anonymen Anmeldung:", error);
+        });
     </script>
 </body>
 </html>

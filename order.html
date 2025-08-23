@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <title>Essensbestellung Spielersitzung</title>
     <link rel="icon" href="favicon.png" type="image/png">
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <style>
         body {
             font-family: sans-serif;
@@ -47,7 +44,6 @@
         .link-button, .home-button {
             background-color: #555;
         }
-        /* NEU: CSS für die Button-Anordnung */
         .button-container {
             display: flex;
             justify-content: space-between;
@@ -82,78 +78,64 @@
         <label for="gericht">Dein Gericht:</label>
         <select id="gericht" required>
             <option value="">Wähle ein Gericht</option>
-            <option value="Gyros-Teller">Gyros-Teller</option>
-            <option value="Gyros-Pita">Gyros-Pita</option>
-            <option value="Suflaki">Suflaki</option>
-            <option value="Bifteki">Bifteki</option>
-            <option value="Griechischer Salat">Griechischer Salat</option>
-            <option value="Bratwurst">Bratwurst</option>
-            <option value="Currywurst">Currywurst</option>
+            <option value="Gyros mit Pommes und Reis 14,50 EUR">Nr. 50) Gyros mit Pommes und Reis 14,50 EUR</option>
+            <option value="Souvlaki mit Pommes und Reis 14,90 EUR">Nr. 53) Souvlaki mit Pommes und Reis 14,90 EUR</option>
+            <option value="Schnitzel Wiener Art mit Pommes 13,90 EUR">Nr. 60) Schnitzel Wiener Art mit Pommes 13,90 EUR</option>
+            <option value="Kotopoulo Hähnchenfilet mit Pommes und Reis 15,50 EUR">Nr. 56) Kotopoulo Hähnchenfilet mit Pommes und Reis 15,50 EUR</option>
+            <option value="Gyros Spezial mit Metaxa Sauce und Käse überbacken 16,90 EUR">Nr. 70) Gyros Spezial mit Metaxa Sauce und Käse überbacken 16,90 EUR</option>
+            <option value="Kalamari paniert und frittiert, mit Reis 16,90 EUR">Nr. 81) Kalamari paniert und frittiert, mit Reis 16,90 EUR</option>
+            <option value="Choriatiki Bauernsalat mit Tomaten und Gurken 10,90 EUR">Nr. 30) Choriatiki Bauernsalat mit Tomaten und Gurken 10,90 EUR</option>
+            <option value="Thunfisch Salat 11,50 EUR">Nr. 8) Thunfisch Salat 11,50 EUR</option>
+            <option value="Pommes 3,50 EUR">Nr. 35) Pommes 3,50 EUR</option>
         </select>
         
-        <label for="sonderwuensche">Sonderwünsche (z.B. "ohne Zwiebeln", "mit Käse", "scharf"):</label>
+        <label for="sonderwuensche">Sonderwünsche oder Anmerkungen zum Gericht:</label>
         <textarea id="sonderwuensche"></textarea>
         
         <button type="submit">Bestellung abschicken</button>
     </form>
 
-    <script>
-    // Firebase-Konfiguration
-    const firebaseConfig = {
-      apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
-      authDomain: "tvw-app-test.firebaseapp.com",
-      projectId: "tvw-app-test",
-      storageBucket: "tvw-app-test.firebasestorage.app",
-      messagingSenderId: "114103141435",
-      appId: "1:114103141435:web:824e76f9109218a1ef881e",
-      measurementId: "G-G1E8WRYGG9"
-    };
+    <script type="module">
+        import { db, auth } from './firebase-config.js';
+        import { serverTimestamp, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
-    // Firebase-App, Firestore und Auth initialisieren
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    let userUid = null;
+        const bestellformular = document.getElementById("bestellformular");
+        const nameInput = document.getElementById("name");
+        const gerichtInput = document.getElementById("gericht");
+        const sonderwuenscheInput = document.getElementById("sonderwuensche");
 
-    // Formular-Elemente
-    const bestellformular = document.getElementById("bestellformular");
-    const nameInput = document.getElementById("name");
-    const gerichtInput = document.getElementById("gericht");
-    const sonderwuenscheInput = document.getElementById("sonderwuensche");
+        let userUid = null;
 
-    // Funktion zum Speichern der Bestellung
-    bestellformular.addEventListener("submit", (e) => {
-        e.preventDefault();
+        bestellformular.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-        const name = nameInput.value;
-        const gericht = gerichtInput.value;
-        const sonderwuensche = sonderwuenscheInput.value;
+            const name = nameInput.value;
+            const gericht = gerichtInput.value;
+            const sonderwuensche = sonderwuenscheInput.value;
 
-        // Bestellung in Firestore speichern
-        db.collection("bestellungen").add({
-            userId: userUid,
-            name: name,
-            gericht: gericht,
-            sonderwuensche: sonderwuensche,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-            alert("Bestellung erfolgreich gespeichert!");
-            bestellformular.reset();
-        })
-        .catch((error) => {
-            console.error("Fehler beim Speichern der Bestellung: ", error);
-            alert("Fehler beim Speichern der Bestellung.");
+            addDoc(collection(db, "bestellungen"), {
+                userId: userUid,
+                name: name,
+                gericht: gericht,
+                sonderwuensche: sonderwuensche,
+                timestamp: serverTimestamp()
+            })
+            .then(() => {
+                alert("Bestellung erfolgreich gespeichert!");
+                bestellformular.reset();
+            })
+            .catch((error) => {
+                console.error("Fehler beim Speichern der Bestellung: ", error);
+                alert("Fehler beim Speichern der Bestellung.");
+            });
         });
-    });
 
-    // Anonyme Anmeldung beim Laden der Seite
-    auth.signInAnonymously().then((userCredential) => {
-        userUid = userCredential.user.uid;
-        console.log("Benutzer-ID:", userUid);
-    }).catch((error) => {
-        console.error("Fehler bei der anonymen Anmeldung:", error);
-    });
+        auth.signInAnonymously().then((userCredential) => {
+            userUid = userCredential.user.uid;
+            console.log("Benutzer-ID:", userUid);
+        }).catch((error) => {
+            console.error("Fehler bei der anonymen Anmeldung:", error);
+        });
     </script>
 </body>
 </html>

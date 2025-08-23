@@ -1,7 +1,8 @@
 // Importiere die benötigten Firebase-Funktionen
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"; // NEU: Firestore importieren
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // Deine Firebase-Web-App-Konfiguration
 const firebaseConfig = {
@@ -18,5 +19,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// Exportiere die Firestore-Datenbank
+// Exportiere die Firestore-Datenbank und Authentifizierung
 export const db = getFirestore(app);
+export const auth = getAuth(app);
