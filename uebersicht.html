@@ -124,33 +124,39 @@
 
         let userUid = null;
 
-        function resetBestellungen() {
-            const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
-            
-            if (bestaetigung) {
-                db.collection("bestellungen").get()
-                .then((querySnapshot) => {
-                    const deletePromises = [];
-                    querySnapshot.forEach((document) => {
-                        deletePromises.push(db.collection("bestellungen").doc(document.id).delete());
-                    });
-                    return Promise.all(deletePromises);
-                })
-                .then(() => {
-                    alert("Alle Bestellungen wurden erfolgreich gelöscht.");
-                })
-                .catch((error) => {
-                    console.error("Fehler beim Löschen aller Bestellungen: ", error);
-                    alert("Fehler beim Löschen der Bestellungen.");
-                });
-            }
-        }
-        
         function printList() {
             window.print();
         }
 
-        resetButton.addEventListener("click", resetBestellungen);
+        resetButton.addEventListener("click", () => {
+            const password = "+Wi1312St+";
+            const enteredPassword = prompt("Bitte geben Sie das Admin-Passwort ein, um alle Bestellungen zu löschen:");
+
+            if (enteredPassword === password) {
+                const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
+                
+                if (bestaetigung) {
+                    db.collection("bestellungen").get()
+                    .then((querySnapshot) => {
+                        const deletePromises = [];
+                        querySnapshot.forEach((document) => {
+                            deletePromises.push(db.collection("bestellungen").doc(document.id).delete());
+                        });
+                        return Promise.all(deletePromises);
+                    })
+                    .then(() => {
+                        alert("Alle Bestellungen wurden erfolgreich gelöscht.");
+                    })
+                    .catch((error) => {
+                        console.error("Fehler beim Löschen aller Bestellungen: ", error);
+                        alert("Fehler beim Löschen der Bestellungen.");
+                    });
+                }
+            } else {
+                alert("Falsches Passwort. Die Bestellungen wurden nicht gelöscht.");
+            }
+        });
+
         printButton.addEventListener("click", printList);
         
         auth.signInAnonymously().then((userCredential) => {
