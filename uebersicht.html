@@ -114,10 +114,13 @@
     <button id="printButton">Liste drucken</button>
 
     <script>
-        const essensliste = document.getElementById("essensliste");
-        const gesamtuebersicht = document.getElementById("gesamtuebersicht");
-        const resetButton = document.getElementById("resetButton");
-        const printButton = document.getElementById("printButton");
+        // Store a reference to the real document object
+        const doc = document;
+        
+        const essensliste = doc.getElementById("essensliste");
+        const gesamtuebersicht = doc.getElementById("gesamtuebersicht");
+        const resetButton = doc.getElementById("resetButton");
+        const printButton = doc.getElementById("printButton");
 
         let userUid = null;
 
@@ -155,8 +158,8 @@
             console.log("Benutzer-ID:", userUid);
 
             db.collection("bestellungen").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
-                const essenslisteElement = document.getElementById("essensliste");
-                const gesamtuebersichtElement = document.getElementById("gesamtuebersicht");
+                const essenslisteElement = doc.getElementById("essensliste");
+                const gesamtuebersichtElement = doc.getElementById("gesamtuebersicht");
                 
                 essenslisteElement.innerHTML = '';
                 
@@ -192,9 +195,9 @@
                         zusammenfassungDaten[gericht].wuensche[sonderwuensche]++;
                     }
 
-                    const li = document.createElement("li");
+                    const li = doc.createElement("li");
                     
-                    const deleteButton = document.createElement("button");
+                    const deleteButton = doc.createElement("button");
                     deleteButton.textContent = "Löschen";
                     deleteButton.style.backgroundColor = "#dc3545";
                     deleteButton.style.width = "auto";
@@ -216,7 +219,7 @@
                         deleteButton.style.display = "none";
                     }
                     
-                    const textSpan = document.createElement("span");
+                    const textSpan = doc.createElement("span");
                     textSpan.innerHTML = `${data.name} bestellt: <strong>${gericht}</strong>. Sonderwünsche: <b>${sonderwuensche}</b>`;
 
                     li.appendChild(textSpan);
