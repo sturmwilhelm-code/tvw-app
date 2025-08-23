@@ -1,11 +1,5 @@
-// Importiere die benötigten Firebase-Funktionen
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-
-// Deine Firebase-Web-App-Konfiguration
-const firebaseConfig = {
+// Firebase-Konfiguration
+var firebaseConfig = {
     apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
     authDomain: "tvw-app-test.firebaseapp.com",
     projectId: "tvw-app-test",
@@ -15,10 +9,9 @@ const firebaseConfig = {
     measurementId: "G-G1E8WRYGG9"
 };
 
-// Initialisiere Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Firebase-App initialisieren
+firebase.initializeApp(firebaseConfig);
 
-// Exportiere die Firestore-Datenbank und Authentifizierung
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+// Datenbank und Authentifizierung
+var db = firebase.firestore();
+var auth = firebase.auth();

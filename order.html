@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Essensbestellung Spielersitzung</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+
     <style>
         body {
             font-family: sans-serif;
@@ -95,14 +102,7 @@
         <button type="submit">Bestellung abschicken</button>
     </form>
 
-    <script type="module">
-        import { db, auth } from './firebase-config.js';
-        import { serverTimestamp, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-        
-        // Die Imports für die Firebase SDKs müssen als Module sein.
-        // Dafür muss der Skript-Tag "type='module'" haben.
-        // Da du bereits ES-Module verwendest, ist das so korrekt.
-
+    <script>
         const bestellformular = document.getElementById("bestellformular");
         const nameInput = document.getElementById("name");
         const gerichtInput = document.getElementById("gericht");
@@ -110,35 +110,31 @@
 
         let userUid = null;
 
-        bestellformular.addEventListener("submit", async (e) => { // async hinzugefügt
+        bestellformular.addEventListener("submit", (e) => {
             e.preventDefault();
 
             const name = nameInput.value;
             const gericht = gerichtInput.value;
             const sonderwuensche = sonderwuenscheInput.value;
-            
-            try {
-                // Hier wird die Bestellung an die Datenbank gesendet
-                const docRef = await addDoc(collection(db, "bestellungen"), {
-                    userId: userUid,
-                    name: name,
-                    gericht: gericht,
-                    sonderwuensche: sonderwuensche,
-                    timestamp: serverTimestamp()
-                });
-                
-                // Nur wenn die Bestellung erfolgreich war, kommt das Pop-up
+
+            // `db` und `auth` sind jetzt global verfügbar
+            db.collection("bestellungen").add({
+                userId: userUid,
+                name: name,
+                gericht: gericht,
+                sonderwuensche: sonderwuensche,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
                 alert("Bestellung erfolgreich gespeichert!");
                 bestellformular.reset();
-
-            } catch (error) {
-                // Bei einem Fehler wird dies ausgelöst
+            })
+            .catch((error) => {
                 console.error("Fehler beim Speichern der Bestellung: ", error);
                 alert("Fehler beim Speichern der Bestellung.");
-            }
+            });
         });
 
-        // Anonyme Authentifizierung, um eine Benutzer-ID zu erhalten
         auth.signInAnonymously().then((userCredential) => {
             userUid = userCredential.user.uid;
             console.log("Benutzer-ID:", userUid);

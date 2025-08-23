@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Essensbestellung Spielersitzung - Übersicht</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+
     <style>
         body {
             font-family: sans-serif;
@@ -106,10 +113,7 @@
     <button id="resetButton" class="reset-button">Alle Bestellungen löschen</button>
     <button id="printButton">Liste drucken</button>
 
-    <script type="module">
-        import { db, auth } from './firebase-config.js';
-        import { collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
-
+    <script>
         const essensliste = document.getElementById("essensliste");
         const gesamtuebersicht = document.getElementById("gesamtuebersicht");
         const resetButton = document.getElementById("resetButton");
@@ -121,11 +125,12 @@
             const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
             
             if (bestaetigung) {
-                getDocs(collection(db, "bestellungen"))
+                db.collection("bestellungen").get()
                 .then((querySnapshot) => {
-                    const deletePromises = querySnapshot.docs.map(document => 
-                        deleteDoc(doc(db, "bestellungen", document.id))
-                    );
+                    const deletePromises = [];
+                    querySnapshot.forEach((document) => {
+                        deletePromises.push(db.collection("bestellungen").doc(document.id).delete());
+                    });
                     return Promise.all(deletePromises);
                 })
                 .then(() => {
@@ -149,8 +154,7 @@
             userUid = userCredential.user.uid;
             console.log("Benutzer-ID:", userUid);
 
-            const q = query(collection(db, "bestellungen"), orderBy("timestamp", "asc"));
-            onSnapshot(q, (querySnapshot) => {
+            db.collection("bestellungen").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
                 essensliste.innerHTML = '';
                 
                 const zusammenfassungDaten = {};
@@ -197,7 +201,7 @@
                     if (data.userId === userUid) {
                         deleteButton.style.display = "inline-block";
                         deleteButton.addEventListener("click", () => {
-                            deleteDoc(doc(db, "bestellungen", document.id))
+                            db.collection("bestellungen").doc(document.id).delete()
                                 .then(() => {
                                     console.log("Dokument erfolgreich gelöscht!");
                                 })
