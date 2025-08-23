@@ -155,14 +155,17 @@
             console.log("Benutzer-ID:", userUid);
 
             db.collection("bestellungen").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
-                essensliste.innerHTML = '';
+                const essenslisteElement = document.getElementById("essensliste");
+                const gesamtuebersichtElement = document.getElementById("gesamtuebersicht");
+                
+                essenslisteElement.innerHTML = '';
                 
                 const zusammenfassungDaten = {};
                 let gesamtBestellungen = 0;
 
                 if (querySnapshot.empty) {
-                    essensliste.innerHTML = "<li><p>Es gibt noch keine Bestellungen.</p></li>";
-                    gesamtuebersicht.innerHTML = "<h3>Zusammenfassung der Bestellungen</h3><p>Keine Bestellungen vorhanden.</p>";
+                    essenslisteElement.innerHTML = "<li><p>Es gibt noch keine Bestellungen.</p></li>";
+                    gesamtuebersichtElement.innerHTML = "<h3>Zusammenfassung der Bestellungen</h3><p>Keine Bestellungen vorhanden.</p>";
                     return;
                 }
 
@@ -218,7 +221,7 @@
 
                     li.appendChild(textSpan);
                     li.appendChild(deleteButton);
-                    essensliste.appendChild(li);
+                    essenslisteElement.appendChild(li);
                 });
 
                 let uebersichtHTML = `<h4>Gesamt: ${gesamtBestellungen} Bestellungen</h4><ul>`;
@@ -236,10 +239,10 @@
                 }
                 uebersichtHTML += '</ul>';
                 
-                gesamtuebersicht.innerHTML = `<h3>Zusammenfassung der Bestellungen</h3>${uebersichtHTML}`;
+                gesamtuebersichtElement.innerHTML = `<h3>Zusammenfassung der Bestellungen</h3>${uebersichtHTML}`;
             }, err => {
                 console.error("Fehler beim Abrufen der Bestellungen: ", err);
-                essensliste.innerHTML = "<li><p>Fehler beim Laden der Bestellungen.</p></li>";
+                essenslisteElement.innerHTML = "<li><p>Fehler beim Laden der Bestellungen.</p></li>";
             });
         }).catch((error) => {
             console.error("Fehler bei der anonymen Anmeldung:", error);
