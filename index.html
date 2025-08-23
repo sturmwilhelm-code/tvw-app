@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>TVW-App</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #d8e1fa;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        /* Container für die nebeneinanderliegenden Buttons */
+        .button-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .button-container a {
+            text-decoration: none;
+        }
+        .button-container button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            background-color: #007bff;
+        }
+        .button-container button:hover {
+            opacity: 0.9;
+        }
+    </style>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker: Registriert'))
+            .catch(err => console.log(`Service Worker: Fehler: ${err}`));
+        });
+      }
+    </script>
+</head>
+<body>
+
+    <div class="header">
+        <img src="head.png" alt="TVW-App Kopfzeile">
+    </div>
+
+    <div class="button-container">
+        <div class="button-row">
+            <a href="order.html">
+                <button>Essensbestellung aufgeben</button>
+            </a>
+            <a href="bestell.html">
+                <button>Bestellübersicht</button>
+            </a>
+        </div>
+        <div class="button-row">
+            <a href="calendar.html">
+                <button>Termine anzeigen</button>
+            </a>
+            <a href="tables.html">
+                <button>Tabellen</button>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

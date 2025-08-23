@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Termine TVW</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #d8e1fa;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #007bff;
+        }
+        .calendar-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .calendar-day {
+            margin-bottom: 20px;
+        }
+        .calendar-day h3 {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .calendar-event {
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        /* Style für die Buttons und den Container */
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-container button {
+            flex: 1;
+            padding: 10px;
+            white-space: nowrap;
+        }
+        .home-button {
+            text-decoration: none;
+        }
+        .home-button button {
+            background-color: #555;
+        }
+        /* Neues Style für die Spalten-Ansicht */
+        .calendar-columns-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .team-column {
+            flex: 1;
+            min-width: 250px;
+        }
+        .team-column h2 {
+            text-align: center;
+        }
+        /* Style für den Ort-Link */
+        .location-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .location-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="head.png" alt="Logo TVW" style="width:100%; max-width:600px; display:block; margin:0 auto;">
+
+    <div class="button-container">
+        <a href="index.html" class="home-button"><button>Startseite</button></a>
+    </div>
+
+    <h1>Spieltermine</h1>
+    
+    <div class="calendar-columns-container">
+        <div id="first-team-column" class="team-column">
+            <h2>1. Mannschaft</h2>
+            <p class="loading-message">Lade Termine...</p>
+        </div>
+        <div id="second-team-column" class="team-column">
+            <h2>2. Mannschaft</h2>
+            <p class="loading-message">Lade Termine...</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+    
+        firebase.initializeApp(firebaseConfig);
+    
+        const db = firebase.firestore();
+        const firstTeamColumn = document.getElementById('first-team-column');
+        const secondTeamColumn = document.getElementById('second-team-column');
+
+        async function loadCalendarEvents() {
+            firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2><p class="loading-message">Lade Termine...</p>';
+            secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p class="loading-message">Lade Termine...</p>';
+            
+            try {
+                // Daten abrufen und nur nach einem Feld sortieren: 'datetime'
+                const querySnapshot = await db.collection("termine").orderBy("datetime").get();
+        
+                if (querySnapshot.empty) {
+                    firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2><p>Keine Termine vorhanden.</p>';
+                    secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p>Keine Termine vorhanden.</p>';
+                    return;
+                }
+                
+                const firstTeamEvents = [];
+                const secondTeamEvents = [];
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.team === '1. Mannschaft') {
+                        firstTeamEvents.push(data);
+                    } else if (data.team === '2. Mannschaft') {
+                        secondTeamEvents.push(data);
+                    }
+                });
+
+                firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2>';
+                secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2>';
+                
+                renderEvents(firstTeamEvents, firstTeamColumn);
+                renderEvents(secondTeamEvents, secondTeamColumn);
+
+            } catch (error) {
+                console.error("Fehler beim Laden der Termine: ", error);
+                firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2><p>Fehler beim Laden der Termine.</p>';
+                secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p>Fehler beim Laden der Termine.</p>';
+            }
+        }
+        
+        function renderEvents(events, columnElement) {
+            if (events.length === 0) {
+                columnElement.innerHTML += '<p>Es sind keine Termine vorhanden.</p>';
+            } else {
+                events.forEach(eventData => {
+                    const eventDate = new Date(eventData.datetime);
+                    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+                    const formattedDate = eventDate.toLocaleDateString('de-DE', options);
+                    const formattedTime = eventDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(eventData.location)}`;
+
+                    const eventDiv = document.createElement('div');
+                    eventDiv.classList.add('calendar-day');
+                    eventDiv.innerHTML = `
+                        <h3>${formattedDate}</h3>
+                        <div class="calendar-event">
+                            <strong>Gegner:</strong> ${eventData.opponent}<br>
+                            <strong>Zeit:</strong> ${formattedTime} Uhr<br>
+                            <strong>Ort:</strong> <a href="${mapsUrl}" target="_blank" class="location-link">${eventData.location}</a>
+                        </div>
+                    `;
+                    columnElement.appendChild(eventDiv);
+                });
+            }
+        }
+        
+        loadCalendarEvents();
+    </script>
+</body>
+</html>

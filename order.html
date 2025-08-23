@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Essensbestellung Spielersitzung</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #d8e1fa;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #007bff;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        label, input, select, textarea {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        input, select, textarea {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .link-button, .home-button {
+            background-color: #555;
+        }
+        /* NEU: CSS für die Button-Anordnung */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-container button {
+            flex: 1;
+            padding: 10px;
+            white-space: nowrap;
+        }
+        .link-button, .home-button {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="head.png" alt="Logo TVW" style="width:100%; max-width:600px; display:block; margin:0 auto;">
+
+    <div class="button-container">
+        <a href="index.html" class="home-button"><button>Startseite</button></a>
+        <a href="uebersicht.html" class="link-button"><button>Bestellübersicht</button></a>
+    </div>
+
+    <h1>Essensbestellung aufgeben</h1>
+
+    <form id="bestellformular">
+        <label for="name">Dein Name:</label>
+        <input type="text" id="name" required>
+        
+        <label for="gericht">Dein Gericht:</label>
+        <select id="gericht" required>
+            <option value="">Wähle ein Gericht</option>
+            <option value="Gyros-Teller">Gyros-Teller</option>
+            <option value="Gyros-Pita">Gyros-Pita</option>
+            <option value="Suflaki">Suflaki</option>
+            <option value="Bifteki">Bifteki</option>
+            <option value="Griechischer Salat">Griechischer Salat</option>
+            <option value="Bratwurst">Bratwurst</option>
+            <option value="Currywurst">Currywurst</option>
+        </select>
+        
+        <label for="sonderwuensche">Sonderwünsche (z.B. "ohne Zwiebeln", "mit Käse", "scharf"):</label>
+        <textarea id="sonderwuensche"></textarea>
+        
+        <button type="submit">Bestellung abschicken</button>
+    </form>
+
+    <script>
+    // Firebase-Konfiguration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+      authDomain: "tvw-app-test.firebaseapp.com",
+      projectId: "tvw-app-test",
+      storageBucket: "tvw-app-test.firebasestorage.app",
+      messagingSenderId: "114103141435",
+      appId: "1:114103141435:web:824e76f9109218a1ef881e",
+      measurementId: "G-G1E8WRYGG9"
+    };
+
+    // Firebase-App, Firestore und Auth initialisieren
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    let userUid = null;
+
+    // Formular-Elemente
+    const bestellformular = document.getElementById("bestellformular");
+    const nameInput = document.getElementById("name");
+    const gerichtInput = document.getElementById("gericht");
+    const sonderwuenscheInput = document.getElementById("sonderwuensche");
+
+    // Funktion zum Speichern der Bestellung
+    bestellformular.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = nameInput.value;
+        const gericht = gerichtInput.value;
+        const sonderwuensche = sonderwuenscheInput.value;
+
+        // Bestellung in Firestore speichern
+        db.collection("bestellungen").add({
+            userId: userUid,
+            name: name,
+            gericht: gericht,
+            sonderwuensche: sonderwuensche,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            alert("Bestellung erfolgreich gespeichert!");
+            bestellformular.reset();
+        })
+        .catch((error) => {
+            console.error("Fehler beim Speichern der Bestellung: ", error);
+            alert("Fehler beim Speichern der Bestellung.");
+        });
+    });
+
+    // Anonyme Anmeldung beim Laden der Seite
+    auth.signInAnonymously().then((userCredential) => {
+        userUid = userCredential.user.uid;
+        console.log("Benutzer-ID:", userUid);
+    }).catch((error) => {
+        console.error("Fehler bei der anonymen Anmeldung:", error);
+    });
+    </script>
+</body>
+</html>
