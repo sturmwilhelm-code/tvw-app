@@ -5,67 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Termine TVW</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+        }
         body {
             font-family: sans-serif;
-            background-color: #d8e1fa;
-            color: #333;
-            max-width: 600px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
-        h1, h2 {
-            color: #007bff;
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+        }
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
         }
         .calendar-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
         .calendar-day {
             margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
         }
         .calendar-day h3 {
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
         }
         .calendar-event {
-            background-color: #f2f2f2;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 5px;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
-        /* Style für die Buttons und den Container */
-        button {
+        .app-button {
             display: block;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            background-color: #007bff;
+            padding: 15px;
+            background-color: var(--button-color);
             color: white;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+        .app-button:active {
+            transform: translateY(0);
         }
         .button-container {
             display: flex;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: center; /* Mittig zentriert */
+            gap: 15px;
             margin-top: 10px;
         }
-        .button-container button {
-            flex: 1;
-            padding: 10px;
-            white-space: nowrap;
-        }
-        .home-button {
+        .button-container a {
+            flex: 0 1 auto; /* Flex-Eigenschaften angepasst */
             text-decoration: none;
         }
-        .home-button button {
-            background-color: #555;
+        .button-container .app-button {
+            padding: 10px 20px; /* Padding angepasst */
+            white-space: nowrap;
         }
-        /* Neues Style für die Spalten-Ansicht */
         .calendar-columns-container {
             display: flex;
             gap: 20px;
@@ -74,45 +113,57 @@
         }
         .team-column {
             flex: 1;
-            min-width: 250px;
+            min-width: 350px;
         }
-        .team-column h2 {
-            text-align: center;
-        }
-        /* Style für den Ort-Link */
         .location-link {
-            color: #007bff;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
         }
         .location-link:hover {
             text-decoration: underline;
         }
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-
-    <img src="head.png" alt="Logo TVW" style="width:100%; max-width:600px; display:block; margin:0 auto;">
-
+    <img src="head.png" alt="Logo TVW" class="logo">
     <div class="button-container">
-        <a href="index.html" class="home-button"><button>Startseite</button></a>
+        <a href="index.html" class="home-button"><button class="app-button">Startseite</button></a>
     </div>
-
     <h1>Spieltermine</h1>
-    
-    <div class="calendar-columns-container">
-        <div id="first-team-column" class="team-column">
-            <h2>1. Mannschaft</h2>
-            <p class="loading-message">Lade Termine...</p>
-        </div>
-        <div id="second-team-column" class="team-column">
-            <h2>2. Mannschaft</h2>
-            <p class="loading-message">Lade Termine...</p>
+    <div class="calendar-container">
+        <div class="calendar-columns-container">
+            <div id="first-team-column" class="team-column">
+                <h2>1. Mannschaft</h2>
+                <p class="loading-message">Lade Termine...</p>
+            </div>
+            <div id="second-team-column" class="team-column">
+                <h2>2. Mannschaft</h2>
+                <p class="loading-message">Lade Termine...</p>
+            </div>
         </div>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -124,9 +175,9 @@
             appId: "1:114103141435:web:824e76f9109218a1ef881e",
             measurementId: "G-G1E8WRYGG9"
         };
-    
+        
         firebase.initializeApp(firebaseConfig);
-    
+        
         const db = firebase.firestore();
         const firstTeamColumn = document.getElementById('first-team-column');
         const secondTeamColumn = document.getElementById('second-team-column');
@@ -136,25 +187,35 @@
             secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p class="loading-message">Lade Termine...</p>';
             
             try {
-                // Daten abrufen und nur nach einem Feld sortieren: 'datetime'
                 const querySnapshot = await db.collection("termine").orderBy("datetime").get();
-        
+                
                 if (querySnapshot.empty) {
                     firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2><p>Keine Termine vorhanden.</p>';
                     secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p>Keine Termine vorhanden.</p>';
                     return;
                 }
                 
+                const now = new Date();
+                const batch = db.batch();
                 const firstTeamEvents = [];
                 const secondTeamEvents = [];
+
                 querySnapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.team === '1. Mannschaft') {
-                        firstTeamEvents.push(data);
-                    } else if (data.team === '2. Mannschaft') {
-                        secondTeamEvents.push(data);
+                    const eventDate = new Date(data.datetime);
+                    
+                    if (eventDate < now) {
+                        batch.delete(doc.ref);
+                    } else {
+                        if (data.team === '1. Mannschaft') {
+                            firstTeamEvents.push(data);
+                        } else if (data.team === '2. Mannschaft') {
+                            secondTeamEvents.push(data);
+                        }
                     }
                 });
+
+                await batch.commit();
 
                 firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2>';
                 secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2>';
@@ -163,7 +224,7 @@
                 renderEvents(secondTeamEvents, secondTeamColumn);
 
             } catch (error) {
-                console.error("Fehler beim Laden der Termine: ", error);
+                console.error("Fehler beim Laden oder Löschen der Termine: ", error);
                 firstTeamColumn.innerHTML = '<h2>1. Mannschaft</h2><p>Fehler beim Laden der Termine.</p>';
                 secondTeamColumn.innerHTML = '<h2>2. Mannschaft</h2><p>Fehler beim Laden der Termine.</p>';
             }
@@ -179,8 +240,8 @@
                     const formattedDate = eventDate.toLocaleDateString('de-DE', options);
                     const formattedTime = eventDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(eventData.location)}`;
-
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventData.location)}`;
+                    
                     const eventDiv = document.createElement('div');
                     eventDiv.classList.add('calendar-day');
                     eventDiv.innerHTML = `

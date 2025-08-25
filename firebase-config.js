@@ -1,5 +1,6 @@
+// firebase-config.js
 // Firebase-Konfiguration
-var firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
     authDomain: "tvw-app-test.firebaseapp.com",
     projectId: "tvw-app-test",
@@ -9,9 +10,14 @@ var firebaseConfig = {
     measurementId: "G-G1E8WRYGG9"
 };
 
-// Firebase-App initialisieren
+// Initialisiere Firebase-App
 firebase.initializeApp(firebaseConfig);
 
-// Datenbank und Authentifizierung
-var db = firebase.firestore();
-var auth = firebase.auth();
+// Lade Firestore-Datenbank
+const db = firebase.firestore();
+
+// Optional: Initialisiere Auth-Modul, falls es benötigt wird
+let auth = null;
+if (typeof firebase.auth !== 'undefined') {
+    auth = firebase.auth();
+}

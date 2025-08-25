@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainingsplan TVW</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --green-header-color: #4CAF50;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+        }
+        .app-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .button-container a {
+            flex: 0 1 auto;
+            text-decoration: none;
+        }
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+        .training-plan-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .training-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            transition: transform 0.2s ease;
+        }
+        .training-card:hover {
+            transform: translateY(-3px);
+        }
+        .training-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .training-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .training-info h2 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: normal;
+        }
+        .training-info h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .training-title {
+            font-size: 1.5rem;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+        .training-details {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            text-align: center;
+            background-color: var(--container-bg-color);
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .detail-item strong {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        .detail-item span {
+            font-size: 0.8rem;
+        }
+        .location-item {
+            text-align: center;
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <img src="head.png" alt="Logo TVW" class="logo">
+    <div class="button-container">
+        <a href="index.html"><button class="app-button">Startseite</button></a>
+        <a href="calendar.html"><button class="app-button">Spieltermine</button></a>
+    </div>
+
+    <h1>Trainingsplan</h1>
+
+    <div id="training-plan-container" class="training-plan-container">
+        <p>Lade Trainingsplan...</p>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+
+    <script>
+        const trainingPlanContainer = document.getElementById('training-plan-container');
+
+        async function loadTrainingSchedule() {
+            try {
+                const now = new Date();
+                const querySnapshot = await db.collection("trainingseinheiten").get();
+
+                if (querySnapshot.empty) {
+                    trainingPlanContainer.innerHTML = '<p>Aktuell sind keine Trainingstage in der Datenbank hinterlegt.</p>';
+                    return;
+                }
+
+                const trainingData = {};
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    trainingData[data.day_of_week] = data;
+                });
+
+                const upcomingTrainings = [];
+                const daysToLoad = 4;
+                let currentDate = new Date(now);
+
+                for (let i = 0; upcomingTrainings.length < daysToLoad; i++) {
+                    currentDate.setDate(now.getDate() + i);
+                    const currentDay = currentDate.getDay();
+
+                    if (currentDay in trainingData) {
+                        const data = trainingData[currentDay];
+                        const dayName = currentDate.toLocaleDateString('de-DE', { weekday: 'short' });
+                        const dayAndMonth = currentDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                        
+                        upcomingTrainings.push({
+                            dayName,
+                            dayAndMonth,
+                            meeting_time: data.meeting_time,
+                            time: data.time,
+                            end_time: data.end_time,
+                            location: data.location
+                        });
+                    }
+                }
+
+                trainingPlanContainer.innerHTML = '';
+                
+                upcomingTrainings.forEach(training => {
+                    const trainingCard = document.createElement('div');
+                    trainingCard.className = 'training-card';
+                    
+                    const headerHTML = `
+                        <div class="training-header">
+                            <div class="training-info">
+                                <h2>${training.dayName}</h2>
+                                <h3>${training.dayAndMonth}</h3>
+                            </div>
+                            <h2 class="training-title">Training</h2>
+                            <div></div>
+                        </div>
+                    `;
+
+                    const detailsHTML = `
+                        <div class="training-details">
+                            <div class="detail-item">
+                                <strong>${training.meeting_time || '--:--'}</strong>
+                                <span>Treffen</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>${training.time || '--:--'}</strong>
+                                <span>Beginn</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>${training.end_time || '--:--'}</strong>
+                                <span>Ende</span>
+                            </div>
+                        </div>
+                        <div class="location-item">
+                            <span><strong>Ort:</strong> ${training.location || 'nicht hinterlegt'}</span>
+                        </div>
+                    `;
+                    
+                    trainingCard.innerHTML = headerHTML + detailsHTML;
+                    trainingPlanContainer.appendChild(trainingCard);
+                });
+                
+            } catch (error) {
+                console.error("Fehler beim Laden der Trainingseinheiten: ", error);
+                trainingPlanContainer.innerHTML = '<p>Fehler beim Laden des Trainingsplans.</p>';
+            }
+        }
+        
+        loadTrainingSchedule();
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabellen TVW</title>
+    <title>Datenschutz TVW</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
         /* Übernahme der Design-Variablen von index.html für Konsistenz */
@@ -49,10 +49,11 @@
         /* Container-Stil für den Inhalt */
         .content {
             background-color: var(--container-bg-color);
-            padding: 20px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
+            
         }
 
         /* Button-Stile für die Navigation */
@@ -62,7 +63,6 @@
             gap: 15px;
             margin-top: 10px;
         }
-
         .app-button {
             display: block;
             width: 100%;
@@ -78,18 +78,9 @@
             font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s ease;
         }
-
         .app-button:hover {
             background-color: var(--button-hover-color);
             transform: translateY(-2px);
-        }
-
-        /* Stil für die Tabellen-Überschriften */
-        .table-container h2 {
-            text-align: center;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 5px;
         }
 
         /* Imprint-Text-Stile */
@@ -108,6 +99,11 @@
             color: #999;
             text-decoration: underline;
         }
+        .content h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -118,24 +114,45 @@
         <a href="calendar.html" class="app-button">Spieltermine</a>
     </div>
 
-    <h1>Tabellen</h1>
+    <h1>Datenschutz</h1>
     
     <div class="content">
-        <div class="table-container">
-            <h2>1. Mannschaft</h2>
-            <div id="fp-widget_root-31h1ijrhZbs2dJmL5YN1fVB8UoZ">
-                <a href="https://www.fupa.net/club/tv-wackersdorf" target="_blank" rel="noopener">TV Wackersdorf auf FuPa</a>
-            </div>
-            <script src="https://widget-api.fupa.net/vendor/widget.js?v1"></script>
-        </div>
-        
-        <div class="table-container">
-            <h2>2. Mannschaft</h2>
-            <div id="fp-widget_root-31h43CPBL9eYN9msC480e7eYa6C">
-                <a href="https://www.fupa.net/club/tv-wackersdorf" target="_blank" rel="noopener">TV Wackersdorf auf FuPa</a>
-            </div>
-            <script src="https://widget-api.fupa.net/vendor/widget.js?v1"></script>
-        </div>
+        <p>
+            Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. In dieser Datenschutzerklärung informieren wir Sie über die Art, den Umfang und den Zweck der Erhebung und Verwendung personenbezogener Daten auf unserer Website.
+        </p>
+
+        <h3>Datenerhebung und -verarbeitung</h3>
+        <p>
+            Wir erheben und verarbeiten personenbezogene Daten nur, soweit dies für die Bereitstellung einer funktionsfähigen Website sowie unserer Inhalte und Leistungen erforderlich ist. Die Erhebung erfolgt auf Grundlage der von Ihnen freiwillig gemachten Angaben. Dies betrifft folgende Bereiche:
+        </p>
+        <ul>
+            <li>
+                <strong>Spieltermine und Trainingsplan:</strong>
+                Wir erfassen und speichern Daten wie Spieltage, Zeiten, Gegner und Orte, um sie in den entsprechenden Kalendern darzustellen. Diese Daten dienen der Information der Vereinsmitglieder und sind öffentlich zugänglich.
+            </li>
+            <li>
+                <strong>Essensbestellung:</strong>
+                Bei der Nutzung der Bestellfunktion werden die von Ihnen eingegebenen Daten (z.B. Name, gewählte Speisen, Uhrzeit der Bestellung) erfasst und in einer Datenbank gespeichert. Diese Daten werden ausschließlich zur Abwicklung der Bestellung verwendet und anschließend gelöscht.
+            </li>
+        </ul>
+        <p>
+            Die Speicherung und Verarbeitung der Daten erfolgt über die Google Firestore Datenbank. Wir haben hierbei die notwendigen Sicherheitsvorkehrungen getroffen, um Ihre Daten bestmöglich zu schützen.
+        </p>
+
+        <h3>FuPa-Widgets</h3>
+        <p>
+            Auf unserer Website nutzen wir Widgets des Anbieters FuPa (Fußball-Passau-Plattform, Inh. Thomas Dersch, Lerchenstraße 10, 94036 Passau). Diese Widgets dienen der Darstellung von aktuellen Tabellen und Spielplänen unserer Mannschaften.
+        </p>
+        <p>
+            Beim Aufruf einer Seite, auf der ein solches Widget eingebunden ist, stellt Ihr Browser eine direkte Verbindung zu den Servern von FuPa her. Dabei wird Ihre IP-Adresse und weitere gerätebezogene Informationen an FuPa übermittelt. Wir haben keinen Einfluss auf den Umfang und die weitere Verarbeitung der Daten, die durch FuPa erhoben werden.
+        </p>
+        <p>
+            Weitere Informationen zum Umgang mit Nutzerdaten finden Sie in der Datenschutzerklärung von FuPa: <a href="https://www.fupa.net/datenschutz" target="_blank">https://www.fupa.net/datenschutz</a>
+        </p>
+
+        <p>
+            Für alle weiteren Fragen zum Datenschutz können Sie uns gerne kontaktieren.
+        </p>
     </div>
     
     <div class="imprint-text">

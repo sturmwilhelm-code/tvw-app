@@ -6,240 +6,350 @@
     <title>Essensbestellung Spielersitzung - Übersicht</title>
     <link rel="icon" href="favicon.png" type="image/png">
     
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    
-    <script src="firebase-config.js"></script>
-
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #d8e1fa;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #007bff;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: white;
-            margin-bottom: 5px;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .reset-button {
-            background-color: #dc3545;
-            margin-top: 20px;
-        }
-        #printButton {
-            background-color: #555;
-        }
-        .zusammenfassung-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-        }
-        #gesamtuebersicht {
-            width: 100%;
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .button-container button {
-            flex: 1;
-            padding: 10px;
-            white-space: nowrap;
-        }
-        .link-button, .home-button {
-            text-decoration: none;
-        }
-        @media print {
-            body > *:not(.print-only) {
-                display: none !important;
-            }
-            body {
-                padding: 0;
-            }
-        }
+    :root {
+        --primary-color: #1A237E;
+        --background-color: #F8F9FA;
+        --container-bg-color: rgba(255, 255, 255, 0.9);
+        --text-color: #333;
+        --button-color: #1A237E;
+        --button-hover-color: #283593;
+        --delete-button-color: #dc3545;
+        --delete-button-hover-color: #c82333;
+    }
+    body {
+        font-family: sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+        line-height: 1.6;
+        background-image: url('background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .logo {
+        width: 100%;
+        max-width: 400px;
+        display: block;
+        margin: 0 auto 20px;
+    }
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .app-button {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+    .app-button:hover {
+        background-color: var(--button-hover-color);
+        transform: translateY(-2px);
+    }
+    .app-button:active {
+        transform: translateY(0);
+    }
+    .container {
+        background-color: var(--container-bg-color);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+    h1, h2, h3 {
+        color: var(--primary-color);
+        text-align: center;
+    }
+    .page-title {
+        color: white;
+    }
+    .order-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .order-item {
+        background-color: #f0f4ff;
+        border: 1px solid #d8e1fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    .order-item-content {
+        flex: 1;
+    }
+    .delete-button {
+        background-color: var(--delete-button-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 14px;
+    }
+    .delete-button:hover {
+        background-color: var(--delete-button-hover-color);
+    }
+    .summary-section {
+        margin-top: 30px;
+        border-top: 2px solid var(--primary-color);
+        padding-top: 20px;
+    }
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        display: none; /* Initial state: hidden */
+    }
+    .modal-content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+    }
+    .modal-content p {
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .modal-buttons {
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+    }
+    .modal-button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s;
+    }
+    .modal-confirm {
+        background-color: var(--delete-button-color);
+        color: white;
+    }
+    .modal-confirm:hover {
+        background-color: var(--delete-button-hover-color);
+    }
+    .modal-cancel {
+        background-color: #ccc;
+        color: var(--text-color);
+    }
+    .modal-cancel:hover {
+        background-color: #aaa;
+    }
+    .imprint-text {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
+        color: #666;
+    }
+    .imprint-text a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .imprint-text a:hover {
+        color: #999;
+        text-decoration: underline;
+    }
     </style>
 </head>
 <body>
 
-    <img src="head.png" alt="Logo TVW" style="width:100%; max-width:600px; display:block; margin:0 auto;">
+    <img src="head.png" alt="Logo TVW" class="logo">
 
     <div class="button-container">
-        <a href="index.html" class="home-button"><button>Startseite</button></a>
-        <a href="order.html" class="link-button"><button>Neue Bestellung aufgeben</button></a>
+        <a href="order.html" class="app-button">Zurück zur Bestellung</a>
     </div>
 
-    <h1>Übersicht der Bestellungen</h1>
-    
-    <div class="zusammenfassung-container print-only">
-        <div id="gesamtuebersicht">
-            <h3>Zusammenfassung der Bestellungen</h3>
-            <p>... wird geladen ...</p>
+    <h1 class="page-title">Essensbestellungen - Übersicht</h1>
+
+    <div class="container">
+        <h2>Einzelbestellungen</h2>
+        <ul id="essensliste" class="order-list">
+            <li><p>Bestellungen werden geladen...</p></li>
+        </ul>
+
+        <div id="gesamtuebersicht" class="summary-section">
+            <p>Zusammenfassung wird geladen...</p>
         </div>
     </div>
-    <hr>
     
-    <h2>Aktuelle Essensliste</h2>
-    <ul id="essensliste"></ul>
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
 
-    <button id="resetButton" class="reset-button">Alle Bestellungen löschen</button>
-    <button id="printButton">Liste drucken</button>
+    <!-- Modal für die Löschbestätigung -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <p>Bist du sicher, dass du diese Bestellung löschen möchtest?</p>
+            <div class="modal-buttons">
+                <button id="confirmDelete" class="modal-button modal-confirm">Ja</button>
+                <button id="cancelDelete" class="modal-button modal-cancel">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        // Store a reference to the real document object
-        const doc = document;
+    <!-- Firebase SDKs für App, Auth und Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
         
-        const essensliste = doc.getElementById("essensliste");
-        const gesamtuebersicht = doc.getElementById("gesamtuebersicht");
-        const resetButton = doc.getElementById("resetButton");
-        const printButton = doc.getElementById("printButton");
+        // Initialisiere Firebase und Firestore
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        let userUid = null;
+        // UI-Elemente
+        const essenslisteElement = document.getElementById('essensliste');
+        const gesamtuebersichtElement = document.getElementById('gesamtuebersicht');
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteButton = document.getElementById('confirmDelete');
+        const cancelDeleteButton = document.getElementById('cancelDelete');
 
-        function printList() {
-            window.print();
+        let pendingDeletion = null; // Speichert die ID des zu löschenden Dokuments
+
+        /**
+         * Zeigt das benutzerdefinierte Modal zur Bestätigung an.
+         * @returns {Promise<boolean>} Ein Promise, das zu `true` auflöst, wenn bestätigt, sonst zu `false`.
+         */
+        function showConfirmModal() {
+            return new Promise(resolve => {
+                deleteModal.style.display = 'flex';
+                confirmDeleteButton.onclick = () => {
+                    deleteModal.style.display = 'none';
+                    resolve(true);
+                };
+                cancelDeleteButton.onclick = () => {
+                    deleteModal.style.display = 'none';
+                    resolve(false);
+                };
+            });
         }
 
-        resetButton.addEventListener("click", () => {
-            const password = "+Wi1312St+";
-            const enteredPassword = prompt("Bitte geben Sie das Admin-Passwort ein, um alle Bestellungen zu löschen:");
+        // Anonyme Anmeldung, damit die Daten gelesen werden können
+        signInAnonymously(auth).then(() => {
+            // Echtzeit-Listener für die Bestellungen in der Firestore-Datenbank
+            onSnapshot(collection(db, "bestellungen"), async (snapshot) => {
+                const bestellungenDaten = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
 
-            if (enteredPassword === password) {
-                const bestaetigung = confirm("Bist du sicher, dass du ALLE Bestellungen löschen möchtest? Dieser Vorgang kann nicht rückgängig gemacht werden.");
-                
-                if (bestaetigung) {
-                    db.collection("bestellungen").get()
-                    .then((querySnapshot) => {
-                        const deletePromises = [];
-                        querySnapshot.forEach((document) => {
-                            deletePromises.push(db.collection("bestellungen").doc(document.id).delete());
-                        });
-                        return Promise.all(deletePromises);
-                    })
-                    .then(() => {
-                        alert("Alle Bestellungen wurden erfolgreich gelöscht.");
-                    })
-                    .catch((error) => {
-                        console.error("Fehler beim Löschen aller Bestellungen: ", error);
-                        alert("Fehler beim Löschen der Bestellungen.");
-                    });
-                }
-            } else {
-                alert("Falsches Passwort. Die Bestellungen wurden nicht gelöscht.");
-            }
-        });
-
-        printButton.addEventListener("click", printList);
-        
-        auth.signInAnonymously().then((userCredential) => {
-            userUid = userCredential.user.uid;
-            console.log("Benutzer-ID:", userUid);
-
-            db.collection("bestellungen").orderBy("timestamp", "asc").onSnapshot((querySnapshot) => {
-                const essenslisteElement = doc.getElementById("essensliste");
-                const gesamtuebersichtElement = doc.getElementById("gesamtuebersicht");
-                
+                // Einzelbestellungen anzeigen
                 essenslisteElement.innerHTML = '';
-                
-                const zusammenfassungDaten = {};
                 let gesamtBestellungen = 0;
+                const zusammenfassungDaten = {};
 
-                if (querySnapshot.empty) {
-                    essenslisteElement.innerHTML = "<li><p>Es gibt noch keine Bestellungen.</p></li>";
-                    gesamtuebersichtElement.innerHTML = "<h3>Zusammenfassung der Bestellungen</h3><p>Keine Bestellungen vorhanden.</p>";
-                    return;
-                }
-
-                querySnapshot.forEach((document) => {
-                    const data = document.data();
+                bestellungenDaten.forEach(bestellung => {
+                    const li = document.createElement('li');
+                    li.className = 'order-item';
                     
-                    const gericht = data.gericht;
-                    const sonderwuensche = data.sonderwuensche || 'Keine';
-                    gesamtBestellungen++;
+                    const content = document.createElement('div');
+                    content.className = 'order-item-content';
+                    content.innerHTML = `
+                        <p><strong>Name:</strong> ${bestellung.name || 'Anonym'}</p>
+                        <p><strong>Gericht:</strong> ${bestellung.gericht}</p>
+                        ${bestellung.wunsch ? `<p><strong>Sonderwunsch:</strong> ${bestellung.wunsch}</p>` : ''}
+                    `;
+                    li.appendChild(content);
 
-                    if (!zusammenfassungDaten[gericht]) {
-                        zusammenfassungDaten[gericht] = {
-                            anzahl: 0,
-                            wuensche: {}
-                        };
-                    }
+                    // Lösch-Button hinzufügen
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Löschen';
+                    deleteButton.className = 'delete-button';
                     
-                    zusammenfassungDaten[gericht].anzahl++;
-
-                    if (sonderwuensche !== 'Keine') {
-                        if (!zusammenfassungDaten[gericht].wuensche[sonderwuensche]) {
-                            zusammenfassungDaten[gericht].wuensche[sonderwuensche] = 0;
+                    // Event-Listener für den Lösch-Button
+                    deleteButton.addEventListener('click', async () => {
+                        const confirmed = await showConfirmModal();
+                        if (confirmed) {
+                            try {
+                                // Nur löschen, wenn der Benutzer ein Admin ist (nicht anonym)
+                                if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                                    await deleteDoc(doc(db, "bestellungen", bestellung.id));
+                                    console.log("Bestellung erfolgreich gelöscht.");
+                                } else {
+                                    console.error("Löschen ist nur für Administratoren erlaubt.");
+                                    // Optional: Meldung an den Benutzer senden, dass er keine Berechtigung hat.
+                                }
+                            } catch (error) {
+                                console.error("Fehler beim Löschen der Bestellung: ", error);
+                            }
                         }
-                        zusammenfassungDaten[gericht].wuensche[sonderwuensche]++;
-                    }
-
-                    const li = doc.createElement("li");
+                    });
                     
-                    const deleteButton = doc.createElement("button");
-                    deleteButton.textContent = "Löschen";
-                    deleteButton.style.backgroundColor = "#dc3545";
-                    deleteButton.style.width = "auto";
-                    deleteButton.style.marginBottom = "0";
-                    deleteButton.style.marginLeft = "10px";
-                    
-                    if (data.userId === userUid) {
-                        deleteButton.style.display = "inline-block";
-                        deleteButton.addEventListener("click", () => {
-                            db.collection("bestellungen").doc(document.id).delete()
-                                .then(() => {
-                                    console.log("Dokument erfolgreich gelöscht!");
-                                })
-                                .catch((error) => {
-                                    console.error("Fehler beim Löschen des Dokuments: ", error);
-                                });
-                        });
-                    } else {
-                        deleteButton.style.display = "none";
-                    }
-                    
-                    const textSpan = doc.createElement("span");
-                    textSpan.innerHTML = `${data.name} bestellt: <strong>${gericht}</strong>. Sonderwünsche: <b>${sonderwuensche}</b>`;
-
-                    li.appendChild(textSpan);
                     li.appendChild(deleteButton);
                     essenslisteElement.appendChild(li);
+
+                    // Daten für die Zusammenfassung aufbereiten
+                    gesamtBestellungen++;
+                    if (zusammenfassungDaten[bestellung.gericht]) {
+                        zusammenfassungDaten[bestellung.gericht].anzahl++;
+                        if (bestellung.wunsch) {
+                            zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.wunsch] = (zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.wunsch] || 0) + 1;
+                        }
+                    } else {
+                        zusammenfassungDaten[bestellung.gericht] = {
+                            anzahl: 1,
+                            wuensche: bestellung.wunsch ? { [bestellung.wunsch]: 1 } : {}
+                        };
+                    }
                 });
 
-                let uebersichtHTML = `<h4>Gesamt: ${gesamtBestellungen} Bestellungen</h4><ul>`;
+                // Zusammenfassung anzeigen
+                let uebersichtHTML = `<h4>Gesamt: ${gesamtBestellungen} Bestellungen</h4><ul class="order-list">`;
                 for (const gericht in zusammenfassungDaten) {
                     const data = zusammenfassungDaten[gericht];
                     uebersichtHTML += `<li><strong>${data.anzahl}x ${gericht}</strong>`;
                     if (Object.keys(data.wuensche).length > 0) {
-                        uebersichtHTML += `<ul>`;
+                        uebersichtHTML += `<ul style="list-style-type: disc; padding-left: 20px;">`;
                         for (const wunsch in data.wuensche) {
                             uebersichtHTML += `<li>${data.wuensche[wunsch]}x Sonderwunsch: ${wunsch}</li>`;
                         }
@@ -250,9 +360,6 @@
                 uebersichtHTML += '</ul>';
                 
                 gesamtuebersichtElement.innerHTML = `<h3>Zusammenfassung der Bestellungen</h3>${uebersichtHTML}`;
-            }, err => {
-                console.error("Fehler beim Abrufen der Bestellungen: ", err);
-                essenslisteElement.innerHTML = "<li><p>Fehler beim Laden der Bestellungen.</p></li>";
             });
         }).catch((error) => {
             console.error("Fehler bei der anonymen Anmeldung:", error);

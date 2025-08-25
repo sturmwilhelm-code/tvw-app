@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datenschutzerklärung</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        h1 {
+            color: var(--primary-color);
+        }
+        h2 {
+            color: var(--primary-color);
+            margin-top: 2em;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--button-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .back-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+        .back-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+    <div class="container">
+        <h1>Datenschutzerklärung</h1>
+        <p>
+            Verantwortlich für die Datenverarbeitung auf dieser App ist:
+            <br>
+            Wilhelm Sturm
+            <br>
+            Rachelstraße 9
+            <br>
+            92421 Schwandorf
+        </p>
+        <p>E-Mail: reffi.sturm@icloud.com</p>
+
+        <h2>1. Erfassung und Verarbeitung von Daten</h2>
+        <p>Wir verwenden Google Firebase (Firestore) zur Speicherung und Verwaltung der Spieltermine und weiterer teaminterner Informationen. Bei der Essensbestellung werden Ihr Name und Ihre Bestellung verarbeitet. Diese Daten dienen ausschließlich der Organisation der Mannschaft.</p>
+        
+        <h2>2. Weitergabe von Daten</h2>
+        <p>Ihre Essensbestellung, einschließlich Ihres Namens, wird an den Betreiber des jeweiligen Lokals weitergegeben, um die Bestellung abwickeln zu können. Diese Daten werden ausschließlich für diesen Zweck verwendet.</p>
+
+        <h2>3. Nutzung von Firebase</h2>
+        <p>Diese App verwendet Google Firebase, um die Funktionalitäten bereitzustellen. Die gespeicherten Daten (Spieltermine, Mannschaftsinformationen, Essensbestellungen) sind ausschließlich für interne Zwecke bestimmt. Firebase wird als Datenbanklösung genutzt und verarbeitet keine weiteren persönlichen Daten der Nutzer.</p>
+
+        <h2>4. Löschung von Daten</h2>
+        <p>Essensbestellungen und abgelaufene Spieltermine werden automatisch aus der Datenbank gelöscht, sobald sie nicht mehr relevant sind (z. B. nach dem Spieltag). Dies dient der Minimierung der Datenmenge. Die Löschung erfolgt automatisch und erfordert keine Handlung des Nutzers.</p>
+        
+        <h2>5. Ihre Rechte</h2>
+        <p>Sie haben das Recht, jederzeit Auskunft über Ihre in der App gespeicherten Daten zu erhalten. Sie können die Löschung, Berichtigung oder Sperrung Ihrer Daten verlangen. Bitte wenden Sie sich hierfür an die im Impressum genannte Kontaktperson.</p>
+
+        <a href="javascript:history.back()" class="back-button">Zurück</a>
+    </div>
+</body>
+</html>

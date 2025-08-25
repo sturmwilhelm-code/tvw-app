@@ -6,87 +6,124 @@
     <title>TVW-App</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #d8e1fa;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header img {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin-bottom: 20px;
-        }
-        .button-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        /* Container für die nebeneinanderliegenden Buttons */
-        .button-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .button-container a {
-            text-decoration: none;
-        }
-        .button-container button {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.2em;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            background-color: #007bff;
-        }
-        .button-container button:hover {
-            opacity: 0.9;
-        }
-    </style>
+    :root {
+        --primary-color: #1A237E;
+        --background-color: #F8F9FA;
+        --container-bg-color: rgba(255, 255, 255, 0.9);
+        --text-color: #333;
+        --button-color: #1A237E;
+        --button-hover-color: #283593;
+    }
+    body {
+        font-family: sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+        line-height: 1.6;
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="/manifest.json">
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker: Registriert'))
-            .catch(err => console.log(`Service Worker: Fehler: ${err}`));
-        });
-      }
-    </script>
+        background-image: url('background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .container {
+        background-color: var(--container-bg-color);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    h1, h2 {
+        color: var(--primary-color);
+        text-align: center;
+        width: 100%;
+    }
+    p {
+        font-size: 16px;
+        text-align: center;
+        width: 100%;
+    }
+    .logo {
+        width: 100%;
+        max-width: 400px;
+        display: block;
+        margin: 0 auto 20px;
+    }
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+        width: 100%;
+        align-items: center;
+    }
+    .app-button {
+        display: block;
+        width: 80%;
+        padding: 15px;
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+    .app-button:hover {
+        background-color: var(--button-hover-color);
+        transform: translateY(-2px);
+    }
+    .app-button:active {
+        transform: translateY(0);
+    }
+    .imprint-text {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
+        color: #666;
+    }
+    .imprint-text a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .imprint-text a:hover {
+        color: #999;
+        text-decoration: underline;
+    }
+</style>
 </head>
 <body>
 
-    <div class="header">
-        <img src="head.png" alt="TVW-App Kopfzeile">
+    <img src="head.png" alt="Logo TVW" class="logo">
+
+    <div class="container">
+        <h1>Willkommen bei der TVW App</h1>
+        <p>Deine zentrale Anlaufstelle für alles rund um den Verein!</p>
+        <div class="button-container">
+            <a href="order.html" class="app-button">Essensbestellung</a>
+            <a href="uebersicht.html" class="app-button">Bestellübersicht</a>
+            <a href="training.html" class="app-button">Trainingsplan</a>
+            <a href="calendar.html" class="app-button">Spieltermine</a>
+            <a href="tables.html" class="app-button">Tabellen</a>
+        </div>
     </div>
 
-    <div class="button-container">
-        <div class="button-row">
-            <a href="order.html">
-                <button>Essensbestellung aufgeben</button>
-            </a>
-            <a href="uebersicht.html">
-                <button>Bestellübersicht</button>
-            </a>
-        </div>
-        <div class="button-row">
-            <a href="calendar.html">
-                <button>Termine anzeigen</button>
-            </a>
-            <a href="tables.html">
-                <button>Tabellen</button>
-            </a>
-        </div>
-    </div>
+    <div class="imprint-text">
+    <p>
+        <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+    </p>
+</div>
 
 </body>
 </html>

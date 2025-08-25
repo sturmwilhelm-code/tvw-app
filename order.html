@@ -13,73 +13,129 @@
     <script src="firebase-config.js"></script>
 
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #d8e1fa;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #007bff;
-        }
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        label, input, select, textarea {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        input, select, textarea {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-        }
-        .link-button, .home-button {
-            background-color: #555;
-        }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .button-container button {
-            flex: 1;
-            padding: 10px;
-            white-space: nowrap;
-        }
-        .link-button, .home-button {
-            text-decoration: none;
-        }
-    </style>
+    :root {
+        --primary-color: #1A237E;
+        --background-color: #F8F9FA;
+        --container-bg-color: rgba(255, 255, 255, 0.9);
+        --text-color: #333;
+        --button-color: #1A237E;
+        --button-hover-color: #283593;
+        --input-border-color: #ccc;
+    }
+    body {
+        font-family: sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+        line-height: 1.6;
+
+        background-image: url('background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .logo {
+        width: 100%;
+        max-width: 400px;
+        display: block;
+        margin: 0 auto 20px;
+    }
+    h1 {
+        color: white; /* Farbe auf Weiß geändert */
+        text-align: center;
+    }
+    .container-form {
+        background-color: var(--container-bg-color);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+    label, input, select, textarea {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    input, select, textarea {
+        padding: 12px;
+        border: 1px solid var(--input-border-color);
+        border-radius: 8px;
+        transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+    .app-button {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+    .app-button:hover {
+        background-color: var(--button-hover-color);
+        transform: translateY(-2px);
+    }
+    .app-button:active {
+        transform: translateY(0);
+    }
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .button-container .app-button {
+        flex: 1;
+        padding: 10px;
+        white-space: nowrap;
+    }
+    .link-button, .home-button {
+        text-decoration: none;
+    }
+    .imprint-text {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 40px;
+        color: #666;
+    }
+    .imprint-text a {
+        color: #666;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .imprint-text a:hover {
+        color: #999;
+        text-decoration: underline;
+    }
+</style>
 </head>
 <body>
 
-    <img src="head.png" alt="Logo TVW" style="width:100%; max-width:600px; display:block; margin:0 auto;">
+    <img src="head.png" alt="Logo TVW" class="logo">
 
     <div class="button-container">
-        <a href="index.html" class="home-button"><button>Startseite</button></a>
-        <a href="uebersicht.html" class="link-button"><button>Bestellübersicht</button></a>
+        <a href="index.html" class="link-button"><button class="app-button">Startseite</button></a>
+        <a href="uebersicht.html" class="link-button"><button class="app-button">Bestellübersicht</button></a>
     </div>
 
     <h1>Essensbestellung aufgeben</h1>
 
-    <form id="bestellformular">
+    <form id="bestellformular" class="container-form">
         <label for="name">Dein Name:</label>
         <input type="text" id="name" required>
         
@@ -100,8 +156,14 @@
         <label for="sonderwuensche">Sonderwünsche oder Anmerkungen zum Gericht:</label>
         <textarea id="sonderwuensche"></textarea>
         
-        <button type="submit">Bestellung abschicken</button>
+        <button type="submit" class="app-button">Bestellung abschicken</button>
     </form>
+    
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
 
     <script>
         const bestellformular = document.getElementById("bestellformular");
@@ -118,7 +180,6 @@
             const gericht = gerichtInput.value;
             const sonderwuensche = sonderwuenscheInput.value;
 
-            // `db` und `auth` sind jetzt global verfügbar
             db.collection("bestellungen").add({
                 userId: userUid,
                 name: name,

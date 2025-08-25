@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin-Login</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        /* Übernahme der Design-Variablen von index.html für Konsistenz */
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+        }
+
+        /* Generelle Body-Stile wie auf der Startseite */
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Logo-Stile */
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        /* H1-Überschrift-Stil für die Hauptseite */
+        h1 {
+            color: white;
+            text-align: center;
+        }
+
+        /* Container-Stil für den Inhalt */
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Formular-Stile */
+        form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        form input, form select, form button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        
+        form button {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Stil für Erfolgs-/Fehlermeldungen */
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="head.png" alt="Logo TVW" class="logo">
+    
+    <h1>Admin-Login</h1>
+    
+    <div class="container">
+        <form id="login-form">
+            <label for="email">E-Mail:</label>
+            <input type="email" id="email" required>
+            
+            <label for="password">Passwort:</label>
+            <input type="password" id="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Firebase SDKs für App und Authentifizierung -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+        
+        // Initialisiere Firebase und Firestore
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const form = document.getElementById('login-form');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = form.email.value;
+            const password = form.password.value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log("Login erfolgreich:", userCredential.user);
+                messageDiv.textContent = 'Login erfolgreich. Weiterleitung...';
+                messageDiv.style.color = 'green';
+                window.location.href = "admin.html"; // Weiterleitung zur Admin-Seite
+            } catch (error) {
+                console.error("Login-Fehler:", error);
+                let errorMessage = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
+                
+                // Angepasste Fehlermeldungen
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = "Kein Nutzer mit dieser E-Mail-Adresse gefunden.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "Das Passwort ist falsch.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "Die E-Mail-Adresse ist ungültig.";
+                        break;
+                    default:
+                        break;
+                }
+
+                messageDiv.textContent = 'Fehler: ' + errorMessage;
+                messageDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>
