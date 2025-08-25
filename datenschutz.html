@@ -30,44 +30,44 @@
             background-attachment: fixed;
         }
         .logo {
+            display: block;
+            margin: 0 auto 20px auto;
             width: 100%;
             max-width: 400px;
-            display: block;
-            margin: 0 auto 20px;
+            height: auto;
         }
         .container {
             background-color: var(--container-bg-color);
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
             margin-top: 20px;
         }
-        h1 {
+        h1, h2 {
             color: var(--primary-color);
-        }
-        h2 {
-            color: var(--primary-color);
-            margin-top: 2em;
+            text-align: center;
         }
         p {
-            margin-bottom: 1em;
+            margin-bottom: 20px;
         }
-        .back-button {
+        .app-button {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
             background-color: var(--button-color);
             color: white;
-            text-decoration: none;
+            padding: 15px 20px;
+            border: none;
             border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s ease;
+            text-align: center;
         }
-        .back-button:hover {
+        .app-button:hover {
             background-color: var(--button-hover-color);
             transform: translateY(-2px);
-        }
-        .back-button:active {
-            transform: translateY(0);
         }
     </style>
 </head>
@@ -75,19 +75,10 @@
     <img src="head.png" alt="Logo TVW" class="logo">
     <div class="container">
         <h1>Datenschutzerklärung</h1>
-        <p>
-            Verantwortlich für die Datenverarbeitung auf dieser App ist:
-            <br>
-            Wilhelm Sturm
-            <br>
-            Rachelstraße 9
-            <br>
-            92421 Schwandorf
-        </p>
-        <p>E-Mail: reffi.sturm@icloud.com</p>
+        <p>Der Schutz Ihrer persönlichen Daten ist uns sehr wichtig. Nachfolgend informieren wir Sie über die Verarbeitung Ihrer Daten im Rahmen der Nutzung unserer App.</p>
 
-        <h2>1. Erfassung und Verarbeitung von Daten</h2>
-        <p>Wir verwenden Google Firebase (Firestore) zur Speicherung und Verwaltung der Spieltermine und weiterer teaminterner Informationen. Bei der Essensbestellung werden Ihr Name und Ihre Bestellung verarbeitet. Diese Daten dienen ausschließlich der Organisation der Mannschaft.</p>
+        <h2>1. Erhebung und Speicherung von Daten</h2>
+        <p>Wir erheben und speichern die Daten, die Sie bei der Essensbestellung eingeben (Name, Gericht, Sonderwünsche). Diese Daten werden ausschließlich dazu genutzt, Ihre Bestellung zu verarbeiten. Diese Daten dienen ausschließlich der Organisation der Mannschaft.</p>
         
         <h2>2. Weitergabe von Daten</h2>
         <p>Ihre Essensbestellung, einschließlich Ihres Namens, wird an den Betreiber des jeweiligen Lokals weitergegeben, um die Bestellung abwickeln zu können. Diese Daten werden ausschließlich für diesen Zweck verwendet.</p>
@@ -101,7 +92,7 @@
         <h2>5. Ihre Rechte</h2>
         <p>Sie haben das Recht, jederzeit Auskunft über Ihre in der App gespeicherten Daten zu erhalten. Sie können die Löschung, Berichtigung oder Sperrung Ihrer Daten verlangen. Bitte wenden Sie sich hierfür an die im Impressum genannte Kontaktperson.</p>
 
-        <a href="javascript:history.back()" class="back-button">Zurück</a>
+        <a href="javascript:history.back()" class="app-button">Zurück</a>
     </div>
 </body>
 </html>

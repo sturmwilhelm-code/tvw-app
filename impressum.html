@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datenschutz TVW</title>
+    <title>Impressum TVW</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
         /* Übernahme der Design-Variablen von index.html für Konsistenz */
@@ -31,110 +31,105 @@
             background-position: center;
             background-attachment: fixed;
         }
-
-        /* Logo-Stile */
+        
+        /* Stile für Logo und Container */
         .logo {
+            display: block;
+            margin: 0 auto 20px auto;
             width: 100%;
             max-width: 400px;
-            display: block;
-            margin: 0 auto 20px;
+            height: auto;
         }
-
-        /* H1-Überschrift-Stil für die Hauptseite */
-        h1 {
-            color: white;
-            text-align: center;
-        }
-
-        /* Container-Stil für den Inhalt */
-        .content {
+        .container {
             background-color: var(--container-bg-color);
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
             margin-top: 20px;
-            
         }
 
-        /* Button-Stile für die Navigation */
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
+        /* Stile für Überschriften */
+        h1, h2, h3 {
+            color: var(--primary-color);
         }
-        .app-button {
+        h1, h2 {
+            text-align: center;
+        }
+        h3 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+        
+        /* Stile für Listen */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 5px;
+        }
+
+        /* Stile für den "Zurück"-Button */
+        .back-button {
             display: block;
-            width: 100%;
-            padding: 15px;
+            width: fit-content;
+            margin-top: 20px;
+            padding: 10px 20px;
             background-color: var(--button-color);
             color: white;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
             text-decoration: none;
             text-align: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s ease;
         }
-        .app-button:hover {
+        .back-button:hover {
             background-color: var(--button-hover-color);
             transform: translateY(-2px);
         }
-
-        /* Imprint-Text-Stile */
-        .imprint-text {
+        .back-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Stile für den Fußzeilen-Text */
+        .footer-links {
             text-align: center;
             font-size: 12px;
             margin-top: 40px;
             color: #666;
         }
-        .imprint-text a {
+        .footer-links a {
             color: #666;
             text-decoration: none;
             transition: color 0.3s ease;
         }
-        .imprint-text a:hover {
+        .footer-links a:hover {
             color: #999;
             text-decoration: underline;
-        }
-        .content h3 {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 5px;
         }
     </style>
 </head>
 <body>
-
     <img src="head.png" alt="Logo TVW" class="logo">
-    <div class="button-container">
-        <a href="index.html" class="app-button">Startseite</a>
-        <a href="calendar.html" class="app-button">Spieltermine</a>
-    </div>
-
-    <h1>Datenschutz</h1>
     
-    <div class="content">
+    <div class="container">
+        <h1>Impressum</h1>
         <p>
-            Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. In dieser Datenschutzerklärung informieren wir Sie über die Art, den Umfang und den Zweck der Erhebung und Verwendung personenbezogener Daten auf unserer Website.
+            Verantwortlich für den Inhalt:<br>
+            <br>
+            Wilhelm Sturm<br>
+            Rachelstraße 9<br>
+            92421 Schwandorf<br>
         </p>
 
-        <h3>Datenerhebung und -verarbeitung</h3>
-        <p>
-            Wir erheben und verarbeiten personenbezogene Daten nur, soweit dies für die Bereitstellung einer funktionsfähigen Website sowie unserer Inhalte und Leistungen erforderlich ist. Die Erhebung erfolgt auf Grundlage der von Ihnen freiwillig gemachten Angaben. Dies betrifft folgende Bereiche:
-        </p>
+        <h2>Kontakt:</h2>
         <ul>
-            <li>
-                <strong>Spieltermine und Trainingsplan:</strong>
-                Wir erfassen und speichern Daten wie Spieltage, Zeiten, Gegner und Orte, um sie in den entsprechenden Kalendern darzustellen. Diese Daten dienen der Information der Vereinsmitglieder und sind öffentlich zugänglich.
-            </li>
-            <li>
-                <strong>Essensbestellung:</strong>
-                Bei der Nutzung der Bestellfunktion werden die von Ihnen eingegebenen Daten (z.B. Name, gewählte Speisen, Uhrzeit der Bestellung) erfasst und in einer Datenbank gespeichert. Diese Daten werden ausschließlich zur Abwicklung der Bestellung verwendet und anschließend gelöscht.
-            </li>
+            <li>E-Mail: <a href="mailto:reffi.sturm@icloud.com">reffi.sturm@icloud.com</a></li>
         </ul>
+        
+        <h3>Datenspeicherung</h3>
         <p>
             Die Speicherung und Verarbeitung der Daten erfolgt über die Google Firestore Datenbank. Wir haben hierbei die notwendigen Sicherheitsvorkehrungen getroffen, um Ihre Daten bestmöglich zu schützen.
         </p>
@@ -149,17 +144,14 @@
         <p>
             Weitere Informationen zum Umgang mit Nutzerdaten finden Sie in der Datenschutzerklärung von FuPa: <a href="https://www.fupa.net/datenschutz" target="_blank">https://www.fupa.net/datenschutz</a>
         </p>
-
-        <p>
-            Für alle weiteren Fragen zum Datenschutz können Sie uns gerne kontaktieren.
-        </p>
+        
+        <a href="index.html" class="back-button">Zurück zur Startseite</a>
     </div>
-    
-    <div class="imprint-text">
+
+    <div class="footer-links">
         <p>
             <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
         </p>
     </div>
-
 </body>
 </html>
