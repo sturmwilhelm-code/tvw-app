@@ -185,6 +185,20 @@
         color: #999;
         text-decoration: underline;
     }
+    @media print {
+        body {
+            background-image: none;
+            max-width: none;
+        }
+        .container {
+            box-shadow: none;
+            background-color: transparent;
+            border: none;
+        }
+        .button-container, .order-item .delete-button, .imprint-text {
+            display: none;
+        }
+    }
     </style>
 </head>
 <body>
@@ -193,6 +207,7 @@
 
     <div class="button-container">
         <a href="order.html" class="app-button">Zurück zur Bestellung</a>
+        <button id="printButton" class="app-button">Zusammenfassung drucken</button>
     </div>
 
     <h1 class="page-title">Essensbestellungen - Übersicht</h1>
@@ -214,7 +229,6 @@
         </p>
     </div>
 
-    <!-- Modal für die Löschbestätigung -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-content">
             <p>Bist du sicher, dass du diese Bestellung löschen möchtest?</p>
@@ -225,7 +239,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs für App, Auth und Firestore -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
@@ -253,8 +266,10 @@
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteButton = document.getElementById('confirmDelete');
         const cancelDeleteButton = document.getElementById('cancelDelete');
+        const printButton = document.getElementById('printButton');
 
         let pendingDeletion = null; // Speichert die ID des zu löschenden Dokuments
+        let currentSummaryData = {}; // Speichert die aktuellen Zusammenfassungsdaten
 
         /**
          * Zeigt das benutzerdefinierte Modal zur Bestätigung an.
@@ -273,6 +288,66 @@
                 };
             });
         }
+        
+        /**
+         * Generiert eine HTML-Tabelle für den Druck
+         * @param {object} data Die Zusammenfassungsdaten
+         * @returns {string} Die fertige HTML-Tabelle
+         */
+        function createPrintTable(data) {
+            let html = `
+                <style>
+                    body { font-family: sans-serif; }
+                    h2 { color: #1A237E; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; color: #1A237E; }
+                    .note { font-style: italic; color: #555; }
+                </style>
+                <h2>Zusammenfassung der Essensbestellungen</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gericht</th>
+                            <th>Anzahl</th>
+                            <th>Sonderwünsche</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            for (const gericht in data) {
+                const item = data[gericht];
+                let wuensche = Object.keys(item.wuensche).length > 0
+                    ? Object.entries(item.wuensche).map(([wunsch, anzahl]) => `${anzahl}x ${wunsch}`).join(', ')
+                    : 'Keine';
+                
+                html += `
+                    <tr>
+                        <td>${gericht}</td>
+                        <td>${item.anzahl}</td>
+                        <td>${wuensche}</td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            return html;
+        }
+
+        // Event-Listener für den Druck-Button
+        printButton.addEventListener('click', () => {
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Bestellungen drucken</title></head><body>');
+            printWindow.document.write(createPrintTable(currentSummaryData));
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        });
 
         // Anonyme Anmeldung, damit die Daten gelesen werden können
         signInAnonymously(auth).then(() => {
@@ -297,7 +372,7 @@
                     content.innerHTML = `
                         <p><strong>Name:</strong> ${bestellung.name || 'Anonym'}</p>
                         <p><strong>Gericht:</strong> ${bestellung.gericht}</p>
-                        ${bestellung.wunsch ? `<p><strong>Sonderwunsch:</strong> ${bestellung.wunsch}</p>` : ''}
+                        ${bestellung.sonderwuensche ? `<p><strong>Sonderwunsch:</strong> ${bestellung.sonderwuensche}</p>` : ''}
                     `;
                     li.appendChild(content);
 
@@ -332,16 +407,21 @@
                     gesamtBestellungen++;
                     if (zusammenfassungDaten[bestellung.gericht]) {
                         zusammenfassungDaten[bestellung.gericht].anzahl++;
-                        if (bestellung.wunsch) {
-                            zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.wunsch] = (zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.wunsch] || 0) + 1;
+                        // Hier wurde wunsch zu sonderwunsch geändert
+                        if (bestellung.sonderwuensche) {
+                            zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.sonderwuensche] = (zusammenfassungDaten[bestellung.gericht].wuensche[bestellung.sonderwuensche] || 0) + 1;
                         }
                     } else {
                         zusammenfassungDaten[bestellung.gericht] = {
                             anzahl: 1,
-                            wuensche: bestellung.wunsch ? { [bestellung.wunsch]: 1 } : {}
+                            // Hier wurde wunsch zu sonderwunsch geändert
+                            wuensche: bestellung.sonderwuensche ? { [bestellung.sonderwuensche]: 1 } : {}
                         };
                     }
                 });
+                
+                // Zusammenfassungsdaten speichern, um sie für den Druck zu verwenden
+                currentSummaryData = zusammenfassungDaten;
 
                 // Zusammenfassung anzeigen
                 let uebersichtHTML = `<h4>Gesamt: ${gesamtBestellungen} Bestellungen</h4><ul class="order-list">`;
