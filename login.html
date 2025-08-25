@@ -30,109 +30,193 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-
-        /* Logo-Stile */
-        .logo {
-            width: 100%;
-            max-width: 400px;
-            display: block;
-            margin: 0 auto 20px;
-        }
-
-        /* H1-Überschrift-Stil für die Hauptseite */
-        h1 {
-            color: white;
-            text-align: center;
-        }
-
-        /* Container-Stil für den Inhalt */
         .container {
             background-color: var(--container-bg-color);
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            backdrop-filter: blur(10px);
         }
-
-        /* Formular-Stile */
-        form label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            height: auto;
+        }
+        h1 {
             color: var(--primary-color);
+            margin-top: 0;
+            font-weight: bold;
         }
-
-        form input, form select, form button {
+        p {
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+        input {
             width: 100%;
             padding: 12px;
-            margin-top: 8px;
-            box-sizing: border-box;
-            border-radius: 8px;
             border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
             font-size: 16px;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
         }
-        
-        form button {
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        /* NEU: Gemeinsame Klasse für die Buttons */
+        .form-button {
             background-color: var(--button-color);
             color: white;
+            padding: 15px 20px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.1em;
-            margin-top: 25px;
-            transition: background-color 0.3s ease;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-decoration: none; /* Wichtig für den Link */
+            display: block; /* Wichtig, um die Breite anzupassen */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+        .form-button:active {
+            transform: translateY(0);
         }
 
-        /* Stil für Erfolgs-/Fehlermeldungen */
         .message {
             margin-top: 20px;
-            text-align: center;
             font-weight: bold;
+        }
+        
+        /* Modal für Fehlermeldungen */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 80%;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-
     <img src="head.png" alt="Logo TVW" class="logo">
-    
-    <h1>Admin-Login</h1>
-    
     <div class="container">
+        <h1>Admin-Login</h1>
         <form id="login-form">
-            <label for="email">E-Mail:</label>
-            <input type="email" id="email" required>
-            
-            <label for="password">Passwort:</label>
-            <input type="password" id="password" required>
-            
-            <button type="submit">Login</button>
+            <input type="email" id="email" placeholder="E-Mail" required>
+            <input type="password" id="password" placeholder="Passwort" required>
+            <!-- Jetzt die neue Klasse verwenden -->
+            <button type="submit" class="form-button">Login</button>
         </form>
-        <div id="message" class="message"></div>
+        <!-- Jetzt die neue Klasse verwenden -->
+        <a href="index.html" class="form-button" style="margin-top: 20px;">Zurück zur Startseite</a>
     </div>
 
-    <!-- Firebase SDKs für App und Authentifizierung -->
+    <!-- Modal für Fehlermeldungen -->
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <p id="message-text"></p>
+        </div>
+    </div>
+    
     <script type="module">
+        // NEU: Importiere die Firebase-Module
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-        
-        // Firebase-Konfiguration
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // VOM NUTZER BEREITGESTELLT: Die Firebase-Konfiguration.
+        // WICHTIG: Die Fehlermeldung 'auth/invalid-api-key' deutet darauf hin,
+        // dass die hier hinterlegten Daten ungültig sind.
+        // Ersetze die Platzhalter unten mit den korrekten Werten aus deinen
+        // Firebase-Projekteinstellungen.
         const firebaseConfig = {
             apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
             authDomain: "tvw-app-test.firebaseapp.com",
             projectId: "tvw-app-test",
             storageBucket: "tvw-app-test.firebasestorage.app",
             messagingSenderId: "114103141435",
-            appId: "1:114103141435:web:824e76f9109218a1ef881e",
-            measurementId: "G-G1E8WRYGG9"
+            appId: "1:114103141435:web:824e76f9109218a1ef881e"
         };
         
-        // Initialisiere Firebase und Firestore
+        // Initialisiere Firebase App
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
+        // Formular und Modal-Elemente
         const form = document.getElementById('login-form');
-        const messageDiv = document.getElementById('message');
+        const messageModal = document.getElementById('message-modal');
+        const messageText = document.getElementById('message-text');
+        const modalClose = document.querySelector('.modal-close');
 
+        // Funktion zum Anzeigen des Modals
+        function showMessage(message, isError = false) {
+            messageText.textContent = message;
+            messageText.style.color = isError ? 'red' : 'green';
+            messageModal.style.display = 'flex';
+        }
+
+        // Event-Listener für das Schließen des Modals
+        modalClose.addEventListener('click', () => {
+            messageModal.style.display = 'none';
+        });
+
+        // Event-Listener für das Login-Formular
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -140,16 +224,22 @@
             const password = form.password.value;
 
             try {
+                // Versuche, den Benutzer anzumelden
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 console.log("Login erfolgreich:", userCredential.user);
-                messageDiv.textContent = 'Login erfolgreich. Weiterleitung...';
-                messageDiv.style.color = 'green';
-                window.location.href = "admin.html"; // Weiterleitung zur Admin-Seite
+                
+                showMessage('Login erfolgreich. Weiterleitung...', false);
+                
+                // Warte kurz, bevor weitergeleitet wird
+                setTimeout(() => {
+                    window.location.href = "admin.html";
+                }, 1500);
+
             } catch (error) {
                 console.error("Login-Fehler:", error);
                 let errorMessage = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
                 
-                // Angepasste Fehlermeldungen
+                // Angepasste Fehlermeldungen basierend auf dem Fehlercode
                 switch(error.code) {
                     case 'auth/user-not-found':
                         errorMessage = "Kein Nutzer mit dieser E-Mail-Adresse gefunden.";
@@ -164,8 +254,8 @@
                         break;
                 }
 
-                messageDiv.textContent = 'Fehler: ' + errorMessage;
-                messageDiv.style.color = 'red';
+                // Zeige Fehlermeldung im Modal an
+                showMessage('Fehler: ' + errorMessage, true);
             }
         });
     </script>
