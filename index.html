@@ -13,60 +13,72 @@
         --text-color: #333;
         --button-color: #1A237E;
         --button-hover-color: #283593;
+        --shadow-color: rgba(0, 0, 0, 0.1);
     }
     body {
         font-family: sans-serif;
         background-color: var(--background-color);
         color: var(--text-color);
-        max-width: 600px;
-        margin: 0 auto;
+        /* Flexiblerer Abstand und zentrierter Inhalt */
         padding: 20px;
         box-sizing: border-box;
         line-height: 1.6;
-
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        
         background-image: url('background.png');
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
     }
+    .logo {
+        /* Logo ist jetzt responsiv */
+        width: 80%;
+        max-width: 400px;
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px var(--shadow-color);
+    }
     .container {
         background-color: var(--container-bg-color);
         padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-    }
-    .logo {
+        border-radius: 20px;
+        box-shadow: 0 4px 10px var(--shadow-color);
+        text-align: center;
         width: 100%;
-        max-width: 400px;
-        display: block;
-        margin: 0 auto 20px;
+        max-width: 600px; /* Begrenzung für größere Bildschirme */
+        margin-bottom: 20px;
     }
     h1 {
-        /* Farbe der Überschrift auf die Hauptfarbe des Designs geändert */
         color: var(--primary-color);
-        text-align: center;
+        margin-top: 0;
+        font-size: 2em; /* Responsivere Schriftgröße */
     }
     .button-container {
         display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 15px; /* Abstand zwischen den Buttons */
+        margin-top: 25px;
     }
     .app-button {
         display: block;
-        width: 100%;
-        padding: 15px;
+        padding: 15px 20px;
         background-color: var(--button-color);
         color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
         text-decoration: none;
-        text-align: center;
+        border-radius: 10px;
         font-size: 18px;
         font-weight: bold;
         transition: background-color 0.3s ease, transform 0.1s ease;
+        text-align: center;
+        /* Buttons sind jetzt 100% breit auf kleinen Bildschirmen, aber begrenzt auf größeren */
+        width: 100%; 
+        max-width: 300px;
+        margin: 0 auto;
     }
     .app-button:hover {
         background-color: var(--button-hover-color);
@@ -75,14 +87,10 @@
     .app-button:active {
         transform: translateY(0);
     }
-    h2 {
-        color: var(--primary-color);
-        text-align: center;
-    }
     .imprint-text {
         text-align: center;
         font-size: 12px;
-        margin-top: 40px;
+        margin-top: 20px; /* Reduzierter Abstand, da Buttons jetzt mehr Platz haben */
         color: #666;
     }
     .imprint-text a {
@@ -94,7 +102,7 @@
         color: #999;
         text-decoration: underline;
     }
-</style>
+    </style>
 </head>
 <body>
 
@@ -106,16 +114,12 @@
         <div class="button-container">
             <a href="order.html" class="app-button">Essensbestellung</a>
             <a href="uebersicht.html" class="app-button">Bestellübersicht</a>
-        </div>
-        <div class="button-container">
             <a href="calendar.html" class="app-button">Spieltermine</a>
             <a href="training.html" class="app-button">Trainingsplan</a>
-        </div>
-        <div class="button-container">
             <a href="tables.html" class="app-button">Tabellen</a>
         </div>
     </div>
-
+    
     <div class="imprint-text">
         <p>
             <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="login.html">Admin</a>
