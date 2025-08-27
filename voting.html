@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVW - Spieler des Tages wählen</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --selected-player-bg: #E8EAF6;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        h1{
+            color: white;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .app-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+
+        #player-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .player-card {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .player-card.selected {
+            border-color: var(--primary-color);
+            background-color: var(--selected-player-bg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        
+        #vote-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        
+        #vote-button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+
+    <div class="button-container">
+        <a href="index.html" class="app-button">Zurück zur Startseite</a>
+        <a href="#" id="resultsLink" class="app-button">Ergebnisse ansehen</a>
+    </div>
+
+    <h1>Abstimmung: Spieler des Tages</h1>
+
+    <div class="container">
+        <h2 id="matchday-title"></h2>
+        <div id="player-options">
+            </div>
+
+        <button id="vote-button" disabled>Stimme abgeben</button>
+        <div id="message"></div>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, limit, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const playerOptionsContainer = document.getElementById('player-options');
+        const voteButton = document.getElementById('vote-button');
+        const messageDiv = document.getElementById('message');
+        const matchdayTitleHeader = document.getElementById('matchday-title');
+        const resultsLink = document.getElementById('resultsLink');
+
+        let selectedPlayer = null;
+        let latestMatchdayId = null;
+
+        // Team aus der URL auslesen
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamParam = urlParams.get('team');
+        const teamName = teamParam === '1' ? '1. Mannschaft' : '2. Mannschaft';
+        resultsLink.href = `results.html?team=${teamParam}`;
+        
+        // Funktion, um den neuesten Spieltag für die ausgewählte Mannschaft zu laden
+        async function loadLatestMatchday() {
+            try {
+                const q = query(collection(db, 'matchdays'), where('team', '==', teamName), orderBy('timestamp', 'desc'), limit(1));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    messageDiv.textContent = `Kein Spieltag für die ${teamName} verfügbar.`;
+                    voteButton.disabled = true;
+                    return;
+                }
+
+                const latestMatchday = querySnapshot.docs[0].data();
+                latestMatchdayId = querySnapshot.docs[0].id;
+                matchdayTitleHeader.textContent = `Abstimmung für den Spieltag der ${teamName} vom ${latestMatchday.date}`;
+                
+                if (latestMatchday.votingClosed) {
+                    messageDiv.textContent = 'Das Voting für diesen Spieltag ist bereits beendet.';
+                    voteButton.style.display = 'none';
+                    playerOptionsContainer.innerHTML = '';
+                    return;
+                }
+                
+                const hasVotedKey = `voted_${latestMatchdayId}`;
+                if (localStorage.getItem(hasVotedKey) === 'true') {
+                    messageDiv.textContent = 'Sie haben bereits für diesen Spieltag abgestimmt.';
+                    voteButton.disabled = true;
+                    return;
+                }
+
+                latestMatchday.players.forEach(player => {
+                    const playerCard = document.createElement('div');
+                    playerCard.classList.add('player-card');
+                    playerCard.dataset.name = player.name;
+                    playerCard.innerHTML = `
+                        <strong>${player.name}</strong>
+                    `;
+                    playerOptionsContainer.appendChild(playerCard);
+
+                    playerCard.addEventListener('click', () => {
+                        document.querySelectorAll('.player-card').forEach(card => {
+                            card.classList.remove('selected');
+                        });
+                        playerCard.classList.add('selected');
+                        selectedPlayer = player.name;
+                        voteButton.disabled = false;
+                    });
+                });
+
+            } catch (error) {
+                console.error("Fehler beim Laden des Spieltags: ", error);
+                messageDiv.textContent = 'Fehler beim Laden der Spielerdaten.';
+                voteButton.disabled = true;
+            }
+        }
+
+        voteButton.addEventListener('click', async () => {
+            if (!selectedPlayer) {
+                messageDiv.textContent = 'Bitte wählen Sie einen Spieler aus.';
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'votes'), {
+                    matchdayId: latestMatchdayId,
+                    voter: 'anonymous',
+                    player: selectedPlayer,
+                    timestamp: new Date()
+                });
+
+                localStorage.setItem(`voted_${latestMatchdayId}`, 'true');
+
+                messageDiv.textContent = `Vielen Dank! Ihre Stimme für ${selectedPlayer} wurde erfolgreich abgegeben.`;
+                messageDiv.style.color = 'green';
+                voteButton.disabled = true;
+            } catch (error) {
+                console.error("Fehler beim Speichern der Stimme: ", error);
+                messageDiv.textContent = 'Fehler beim Speichern Ihrer Stimme.';
+                messageDiv.style.color = 'red';
+            }
+        });
+
+        loadLatestMatchday();
+    </script>
+</body>
+</html>

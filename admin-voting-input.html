@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Spieltags-Daten eingeben</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --delete-button-color: #dc3545;
+            --delete-button-hover-color: #c82333;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        form input[type="text"], 
+        form input[type="date"],
+        form select, 
+        form button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        form button {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: var(--button-hover-color);
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .app-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .player-row input[type="text"] {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .add-player-button {
+            display: block;
+            width: auto;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+        }
+
+        .add-player-button:hover {
+            background-color: #45a049;
+        }
+        
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .goal-input {
+            width: 50px; /* Kleinere Breite für das Tore-Input */
+        }
+
+        .end-voting-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+        }
+        
+        .end-voting-section select {
+            margin-bottom: 10px;
+        }
+        
+        .end-voting-section button {
+            background-color: var(--delete-button-color);
+            margin-top: 10px;
+        }
+        
+        .end-voting-section button:hover {
+            background-color: var(--delete-button-hover-color);
+        }
+        
+        #endVotingMessage {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+
+    <div class="button-container">
+        <a href="admin.html" class="app-button">Zurück zum Admin-Bereich</a>
+    </div>
+
+    <h1>Spieltags-Daten eingeben</h1>
+
+    <div class="container">
+        <form id="voting-form">
+            <label for="matchDate">Datum des Spieltags:</label>
+            <input type="date" id="matchDate" required>
+            
+            <label for="teamSelect">Mannschaft auswählen:</label>
+            <select id="teamSelect" required>
+                <option value="1. Mannschaft">1. Mannschaft</option>
+                <option value="2. Mannschaft">2. Mannschaft</option>
+            </select>
+
+            <h3>Spieler und Punkte</h3>
+            <p>Tragen Sie die Namen der Spieler ein. Der erste Spieler ist der Torwart.</p>
+
+            <div class="player-row">
+                <input type="text" id="goalkeeperName" placeholder="Name Torwart" required>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="keeperPenaltySaved">
+                        11m gehalten (+3)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="cleanSheet">
+                        Zu-Null (+1)
+                    </label>
+                </div>
+            </div>
+
+            <div id="fieldPlayersContainer">
+                <div class="player-row">
+                    <input type="text" name="playerName" placeholder="Name Feldspieler">
+                    <div class="checkbox-group">
+                        <label>
+                            Tore (+1 pro Tor):
+                        </label>
+                        <input type="number" name="goalsScored" class="goal-input" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="addPlayerButton" class="app-button add-player-button">
+                + Weitere Spieler hinzufügen
+            </button>
+            
+            <button type="submit" style="margin-top: 20px;">Daten speichern</button>
+        </form>
+        <div id="message"></div>
+
+        <div class="end-voting-section">
+            <h3>Abstimmung manuell beenden</h3>
+            <p>Wählen Sie ein laufendes Voting aus, um es zu beenden.</p>
+            <select id="activeVotingsSelect">
+                </select>
+            <button id="endVotingButton" disabled>Abstimmung beenden</button>
+            <div id="endVotingMessage"></div>
+        </div>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const votingForm = document.getElementById('voting-form');
+        const fieldPlayersContainer = document.getElementById('fieldPlayersContainer');
+        const addPlayerButton = document.getElementById('addPlayerButton');
+        const endVotingButton = document.getElementById('endVotingButton');
+        const activeVotingsSelect = document.getElementById('activeVotingsSelect');
+        const messageDiv = document.getElementById('message');
+        const endVotingMessageDiv = document.getElementById('endVotingMessage');
+
+        // Funktion zum Laden der aktiven Votings
+        async function loadActiveVotings() {
+            try {
+                const q = query(collection(db, 'matchdays'), where('votingClosed', '==', false));
+                const querySnapshot = await getDocs(q);
+
+                activeVotingsSelect.innerHTML = ''; // Leere die Liste
+                
+                if (querySnapshot.empty) {
+                    activeVotingsSelect.innerHTML = '<option value="">Keine aktiven Votings</option>';
+                    endVotingButton.disabled = true;
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const matchdayData = doc.data();
+                        const option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = `${matchdayData.team} vom ${matchdayData.date}`;
+                        activeVotingsSelect.appendChild(option);
+                    });
+                    endVotingButton.disabled = false;
+                }
+            } catch (error) {
+                console.error("Fehler beim Laden der aktiven Votings: ", error);
+                endVotingMessageDiv.textContent = 'Fehler beim Laden der Votings.';
+                endVotingMessageDiv.style.color = 'red';
+                endVotingButton.disabled = true;
+            }
+        }
+        
+        // Initiales Laden der Votings
+        loadActiveVotings();
+
+        // Event-Listener für das manuelle Beenden der Abstimmung
+        endVotingButton.addEventListener('click', async () => {
+            const selectedMatchdayId = activeVotingsSelect.value;
+            if (!selectedMatchdayId) {
+                endVotingMessageDiv.textContent = 'Bitte ein Voting auswählen.';
+                return;
+            }
+
+            if (confirm('Sind Sie sicher, dass Sie diese Abstimmung beenden möchten?')) {
+                try {
+                    const matchdayRef = doc(db, 'matchdays', selectedMatchdayId);
+                    
+                    await updateDoc(matchdayRef, {
+                        votingClosed: true
+                    });
+                    
+                    endVotingMessageDiv.textContent = 'Abstimmung erfolgreich beendet!';
+                    endVotingMessageDiv.style.color = 'green';
+                    
+                    // Die Liste der Votings aktualisieren
+                    loadActiveVotings();
+
+                } catch (error) {
+                    console.error("Fehler beim Beenden der Abstimmung: ", error);
+                    endVotingMessageDiv.textContent = 'Fehler beim Beenden der Abstimmung.';
+                    endVotingMessageDiv.style.color = 'red';
+                }
+            }
+        });
+        
+        // Funktion zum Hinzufügen eines neuen Feldspieler-Eingabefeldes
+        function addPlayerInput() {
+            const playerRow = document.createElement('div');
+            playerRow.classList.add('player-row');
+            playerRow.innerHTML = `
+                <input type="text" name="playerName" placeholder="Name Feldspieler">
+                <div class="checkbox-group">
+                    <label>
+                        Tore (+1 pro Tor):
+                    </label>
+                    <input type="number" name="goalsScored" class="goal-input" value="0" min="0">
+                </div>
+            `;
+            fieldPlayersContainer.appendChild(playerRow);
+        }
+
+        addPlayerButton.addEventListener('click', () => {
+            addPlayerInput();
+        });
+
+        votingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const matchDate = document.getElementById('matchDate').value;
+            const team = document.getElementById('teamSelect').value;
+            const goalkeeperName = document.getElementById('goalkeeperName').value;
+            const keeperPenaltySaved = document.getElementById('keeperPenaltySaved').checked;
+            const cleanSheet = document.getElementById('cleanSheet').checked;
+            
+            const players = [];
+
+            // Torwart-Daten hinzufügen
+            if (goalkeeperName) {
+                players.push({
+                    name: goalkeeperName,
+                    role: 'Torwart',
+                    penaltySaved: keeperPenaltySaved,
+                    cleanSheet: cleanSheet,
+                    goalsScored: 0
+                });
+            }
+
+            // Feldspieler-Daten abrufen und hinzufügen
+            const playerInputs = document.querySelectorAll('#fieldPlayersContainer .player-row');
+            playerInputs.forEach(row => {
+                const nameInput = row.querySelector('input[name="playerName"]');
+                const goalsInput = row.querySelector('input[name="goalsScored"]');
+                
+                if (nameInput.value) {
+                    players.push({
+                        name: nameInput.value,
+                        role: 'Feldspieler',
+                        goalsScored: parseInt(goalsInput.value, 10) || 0
+                    });
+                }
+            });
+
+            // Datenobjekt für Firebase erstellen
+            const matchData = {
+                date: matchDate,
+                team: team, // Das neue Feld 'team'
+                players: players,
+                timestamp: serverTimestamp(),
+                votingClosed: false
+            };
+
+            try {
+                await addDoc(collection(db, 'matchdays'), matchData);
+                messageDiv.textContent = `Spieltags-Daten für die ${team} erfolgreich gespeichert! Das Voting ist jetzt offen.`;
+                messageDiv.style.color = 'green';
+                votingForm.reset();
+                fieldPlayersContainer.innerHTML = `
+                    <div class="player-row">
+                        <input type="text" name="playerName" placeholder="Name Feldspieler">
+                        <div class="checkbox-group">
+                            <label>
+                                Tore (+1 pro Tor):
+                            </label>
+                            <input type="number" name="goalsScored" class="goal-input" value="0" min="0">
+                        </div>
+                    </div>
+                `;
+                // Liste der Votings aktualisieren
+                loadActiveVotings();
+
+            } catch (error) {
+                console.error("Fehler beim Speichern der Daten: ", error);
+                messageDiv.textContent = 'Fehler beim Speichern der Daten.';
+                messageDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVW - Spieler des Tages Ergebnisse</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --winner-color: #FFC107;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+        }
+
+        
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .app-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+        
+        #results-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        
+        .player-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .player-result:last-child {
+            border-bottom: none;
+        }
+        
+        .player-result h3 {
+            margin: 0;
+            flex: 1;
+            font-size: 1.2em;
+        }
+
+        .player-result .score {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+
+        .player-result.winner {
+            background-color: var(--winner-color);
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid #FFEB3B;
+            transform: scale(1.05);
+        }
+        
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+
+    <div class="button-container">
+        <a href="index.html" class="app-button">Zurück zur Startseite</a>
+        <a href="#" id="votingLink" class="app-button">Zur Abstimmung</a>
+    </div>
+
+    <h1>Ergebnisse: Spieler des Tages</h1>
+
+    <div class="container">
+        <h2 id="matchday-title"></h2>
+        <div id="results-display">
+            <div id="message">Lade Ergebnisse...</div>
+            <ul id="results-list"></ul>
+        </div>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const resultsList = document.getElementById('results-list');
+        const messageDiv = document.getElementById('message');
+        const matchdayTitleHeader = document.getElementById('matchday-title');
+        const votingLink = document.getElementById('votingLink');
+
+        // Team aus der URL auslesen
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamParam = urlParams.get('team');
+        const teamName = teamParam === '1' ? '1. Mannschaft' : '2. Mannschaft';
+        votingLink.href = `voting.html?team=${teamParam}`;
+
+        // Funktion, um die Ergebnisse zu laden und anzuzeigen
+        async function loadResults() {
+            try {
+                // 1. Letzten Spieltag für die ausgewählte Mannschaft abrufen
+                const matchdayQuery = query(collection(db, 'matchdays'), where('team', '==', teamName), orderBy('timestamp', 'desc'), limit(1));
+                const matchdaySnapshot = await getDocs(matchdayQuery);
+
+                if (matchdaySnapshot.empty) {
+                    messageDiv.textContent = `Kein Spieltag-Ergebnis für die ${teamName} verfügbar.`;
+                    return;
+                }
+
+                const latestMatchday = matchdaySnapshot.docs[0].data();
+                const latestMatchdayId = matchdaySnapshot.docs[0].id;
+                matchdayTitleHeader.textContent = `Ergebnisse für den Spieltag der ${teamName} vom ${latestMatchday.date}`;
+                
+                // 2. Alle Stimmen für diesen Spieltag abrufen
+                const votesQuery = query(collection(db, 'votes'), where('matchdayId', '==', latestMatchdayId));
+                const votesSnapshot = await getDocs(votesQuery);
+
+                const playerScores = {};
+                
+                // 3. Automatische Punkte und Spieler-Voting-Punkte zusammenzählen
+                latestMatchday.players.forEach(player => {
+                    let autoPoints = 0;
+                    if (player.role === 'Torwart') {
+                        if (player.penaltySaved) autoPoints += 3;
+                        if (player.cleanSheet) autoPoints += 1;
+                    } else if (player.role === 'Feldspieler') {
+                        if (player.goalsScored) autoPoints += player.goalsScored;
+                    }
+                    playerScores[player.name] = autoPoints;
+                });
+                
+                votesSnapshot.forEach(doc => {
+                    const vote = doc.data();
+                    if (playerScores[vote.player] !== undefined) {
+                        playerScores[vote.player] += 1;
+                    }
+                });
+
+                // 4. Ergebnisse sortieren und anzeigen
+                const sortedPlayers = Object.keys(playerScores).sort((a, b) => playerScores[b] - playerScores[a]);
+                
+                let firstPlaceScore = -1;
+                messageDiv.textContent = '';
+                
+                if (sortedPlayers.length === 0) {
+                    resultsList.innerHTML = '<p>Keine Spieler-Ergebnisse vorhanden.</p>';
+                    return;
+                }
+                
+                sortedPlayers.forEach((playerName, index) => {
+                    const score = playerScores[playerName];
+                    if (index === 0) {
+                        firstPlaceScore = score;
+                    }
+                    
+                    const isWinner = score === firstPlaceScore && firstPlaceScore > 0;
+                    
+                    const resultItem = document.createElement('li');
+                    resultItem.classList.add('player-result');
+                    if (isWinner) {
+                        resultItem.classList.add('winner');
+                    }
+                    
+                    resultItem.innerHTML = `
+                        <h3>${playerName}</h3>
+                        <span class="score">${score} Punkte</span>
+                    `;
+                    resultsList.appendChild(resultItem);
+                });
+
+            } catch (error) {
+                console.error("Fehler beim Laden der Ergebnisse: ", error);
+                messageDiv.textContent = 'Fehler beim Laden der Ergebnisse.';
+            }
+        }
+        
+        loadResults();
+    </script>
+</body>
+</html>
