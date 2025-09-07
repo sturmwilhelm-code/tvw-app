@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVW-App - Feedback</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --input-border-color: #ccc;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .app-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            margin: 20px auto 0;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+        
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+    
+    <div class="container">
+        <h1>Kritik und Vorschläge</h1>
+        <p style="text-align: center;">Wir freuen uns über Ihr Feedback, um die App stetig zu verbessern.</p>
+        
+        <form id="feedback-form">
+            <label for="name">Ihr Name (optional):</label>
+            <input type="text" id="name" name="name" placeholder="Max Mustermann">
+            
+            <label for="feedback">Ihre Nachricht:</label>
+            <textarea id="feedback" name="feedback" required placeholder="Ihr Feedback hier..."></textarea>
+            
+            <button type="submit" class="app-button">Absenden</button>
+        </form>
+        
+        <div id="message"></div>
+
+        <a href="index.html" class="app-button">Zurück zur Startseite</a>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_IoSZ3qjx7vy59MZiPNp1F5_6a9OEYYI",
+            authDomain: "tvw-app-test.firebaseapp.com",
+            projectId: "tvw-app-test",
+            storageBucket: "tvw-app-test.firebasestorage.app",
+            messagingSenderId: "114103141435",
+            appId: "1:114103141435:web:824e76f9109218a1ef881e",
+            measurementId: "G-G1E8WRYGG9"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('feedback-form');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const feedback = document.getElementById('feedback').value;
+
+            if (!feedback) {
+                messageDiv.textContent = 'Bitte geben Sie eine Nachricht ein.';
+                messageDiv.style.color = 'red';
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'feedback'), {
+                    name: name || 'Anonym',
+                    feedback: feedback,
+                    timestamp: new Date()
+                });
+                
+                messageDiv.textContent = 'Vielen Dank! Ihr Feedback wurde erfolgreich gesendet.';
+                messageDiv.style.color = 'green';
+                form.reset();
+
+            } catch (error) {
+                console.error("Fehler beim Senden des Feedbacks: ", error);
+                messageDiv.textContent = 'Fehler beim Senden des Feedbacks.';
+                messageDiv.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

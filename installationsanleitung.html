@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVW-App - Installation</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <style>
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .installation-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 15px;
+        }
+        
+        .step-text {
+            font-size: 1.1em;
+            display: flex; /* Flexbox für Text und Bild im Schritt */
+            align-items: center; /* Vertikale Zentrierung von Text und Bild */
+            gap: 8px; /* Abstand zwischen Text und Bild */
+        }
+
+        .step-icon {
+            height: 1.2em; /* Höhe des Symbols, passt sich der Schriftgröße an */
+            vertical-align: middle; /* Vertikale Ausrichtung */
+            margin-left: 5px; /* Etwas Abstand zum vorherigen Text */
+        }
+        
+        .imprint-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 40px;
+            color: #666;
+        }
+        
+        .imprint-text a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .imprint-text a:hover {
+            color: #999;
+            text-decoration: underline;
+        }
+        
+        .app-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            margin: 20px auto 0;
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+    
+    <div class="container">
+        <h1>App auf dem Startbildschirm installieren</h1>
+        <p>Um die TVW-App direkt von Ihrem Startbildschirm zu starten, folgen Sie einfach dieser Anleitung. Es ist keine Installation aus einem App Store notwendig.</p>
+
+        <h2>Für Android-Nutzer</h2>
+        <div class="installation-step">
+            <span class="step-number">1.</span>
+            <span class="step-text">Öffne die TVW-App im Chrome-Browser <img src="chrome-icon.png" alt="chrome-icon" class="step-icon"> auf Ihrem Smartphone.</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">2.</span>
+            <span class="step-text">Tippe auf das Menü-Symbol <img src="android-menu-icon.png" alt="Menü-Symbol" class="step-icon"> in der oberen rechten Ecke des Browsers.</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">3.</span>
+            <span class="step-text">Wähle im Menü die Option "Zum Startbildschirm hinzufügen".</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">4.</span>
+            <span class="step-text">Bestätigen Sie den Vorgang. Ein TVW-App-Symbol erscheint nun auf Ihrem Startbildschirm.</span>
+        </div>
+        
+        <hr style="margin: 40px 0;">
+
+        <h2>Für iOS-Nutzer (iPhone/iPad)</h2>
+        <div class="installation-step">
+            <span class="step-number">1.</span>
+            <span class="step-text">Öffne die TVW-App im Safari-Browser <img src="safari-icon.png" alt="safari-icon" class="step-icon"> auf Ihrem iPhone.</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">2.</span>
+            <span class="step-text">Tippe auf das Teilen-Symbol<img src="ios-share-icon.png" alt="Teilen-Symbol" class="step-icon"> in der unteren Symbolleiste.</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">3.</span>
+            <span class="step-text">Scrolle nach unten und wähle "Zum Home-Bildschirm".</span>
+        </div>
+        <div class="installation-step">
+            <span class="step-number">4.</span>
+            <span class="step-text">Gib der App einen Namen (z. B. TVW-App) und tippe auf "Hinzufügen".</span>
+        </div>
+
+        <a href="index.html" class="app-button">Zurück zur Startseite</a>
+    </div>
+
+    <div class="imprint-text">
+        <p>
+            <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -60,9 +60,15 @@
         .button-container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+            justify-content: space-between;
             gap: 15px;
             margin-bottom: 20px;
+        }
+
+        .button-container a, .button-container button {
+            flex: 1;
+            text-decoration: none;
+            white-space: nowrap;
         }
         
         .app-button {
@@ -165,6 +171,7 @@
 
     <div class="button-container">
         <a href="index.html" class="app-button">Zurück zur Startseite</a>
+        <a href="voting-selection.html" class="app-button">Zurück zur Auswahl</a>
         <a href="#" id="resultsLink" class="app-button">Ergebnisse ansehen</a>
     </div>
 

@@ -67,13 +67,14 @@
         }
         .button-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             gap: 15px;
             margin-top: 10px;
         }
-        .button-container a {
-            flex: 0 1 auto;
+        .button-container a, .button-container button{
+            flex: 1;
             text-decoration: none;
+            white-space: nowrap;
         }
         .imprint-text {
             text-align: center;

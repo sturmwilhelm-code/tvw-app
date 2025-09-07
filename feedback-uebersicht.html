@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback-Übersicht</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    
+    <script src="firebase-config.js"></script>
+
+    <style>
+        /* Übernahme der Design-Variablen von index.html für Konsistenz */
+        :root {
+            --primary-color: #1A237E;
+            --background-color: #F8F9FA;
+            --container-bg-color: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --button-color: #1A237E;
+            --button-hover-color: #283593;
+            --delete-button-color: #dc3545;
+            --delete-button-hover-color: #c82333;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .container {
+            background-color: var(--container-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        .feedback-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .feedback-item strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+
+        .feedback-item .timestamp {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .feedback-item .message {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--delete-button-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .delete-button:hover {
+            background-color: var(--delete-button-hover-color);
+            transform: scale(1.1);
+        }
+
+        .app-button {
+            display: inline-block;
+            padding: 15px 20px;
+            background-color: var(--button-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 20px;
+        }
+
+        .app-button:hover {
+            background-color: var(--button-hover-color);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <img src="head.png" alt="Logo TVW" class="logo">
+
+    <div class="container">
+        <h1>Kritik & Vorschläge Übersicht</h1>
+        <div id="feedback-list">
+            <p>Lade Vorschläge...</p>
+        </div>
+        <a href="admin.html" class="app-button">Zurück zum Admin-Bereich</a>
+    </div>
+
+    <script>
+        // Sicherheit: Nur für eingeloggte Admins
+        firebase.auth().onAuthStateChanged(user => {
+            if (user && !user.isAnonymous) {
+                console.log("Admin eingeloggt. Zeige Feedback an.");
+                loadFeedback();
+            } else {
+                console.log("Nicht als Admin eingeloggt. Weiterleitung...");
+                window.location.href = "login.html";
+            }
+        });
+
+        const feedbackListElement = document.getElementById('feedback-list');
+
+        function loadFeedback() {
+            // Holen der Daten aus der 'feedback'-Kollektion, sortiert nach Zeitstempel
+            db.collection("feedback").orderBy("timestamp", "desc").get()
+                .then((querySnapshot) => {
+                    feedbackListElement.innerHTML = ''; 
+                    if (querySnapshot.empty) {
+                        feedbackListElement.innerHTML = '<p>Keine Vorschläge vorhanden.</p>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const feedback = doc.data();
+                        const feedbackId = doc.id;
+                        const timestamp = feedback.timestamp ? feedback.timestamp.toDate() : new Date();
+                        
+                        const feedbackItem = document.createElement('div');
+                        feedbackItem.classList.add('feedback-item');
+                        feedbackItem.innerHTML = `
+                            <strong>Von: ${feedback.name || 'Anonym'}</strong>
+                            <span class="timestamp">${timestamp.toLocaleString('de-DE')}</span>
+                            <div class="message">${feedback.feedback}</div>
+                            <button class="delete-button" data-id="${feedbackId}">×</button>
+                        `;
+                        feedbackListElement.appendChild(feedbackItem);
+                    });
+                    
+                    // Event Listener für die Lösch-Buttons hinzufügen
+                    document.querySelectorAll('.delete-button').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const idToDelete = e.target.dataset.id;
+                            if (confirm('Sind Sie sicher, dass Sie diesen Vorschlag löschen möchten?')) {
+                                deleteFeedback(idToDelete);
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error("Fehler beim Laden der Vorschläge: ", error);
+                    feedbackListElement.innerHTML = '<p>Fehler beim Laden der Vorschläge.</p>';
+                });
+        }
+
+        function deleteFeedback(id) {
+            db.collection("feedback").doc(id).delete().then(() => {
+                console.log("Dokument erfolgreich gelöscht!");
+                // Feedback-Liste nach dem Löschen neu laden
+                loadFeedback(); 
+            }).catch((error) => {
+                console.error("Fehler beim Löschen des Dokuments: ", error);
+                alert("Fehler beim Löschen des Vorschlags.");
+            });
+        }
+    </script>
+</body>
+</html>
